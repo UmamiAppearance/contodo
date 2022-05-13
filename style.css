@@ -1,0 +1,38 @@
+.html-console {
+    position: inherit;
+    display: block;
+    font-family: "monospace";
+    font-size: inherit;
+    width: inherit;
+    min-width: 100px;
+    height: inherit;
+    min-height: 100px;
+    white-space: break-spaces;
+}
+.html-console > .log {
+    border-color: rgba(157, 157, 157, 0.2);
+    border-width: 0 0 1pt 0;
+    border-style: solid;
+    padding: 2px 5px;
+}
+.html-console > .log:first-child {
+    border-width: 1pt 0;
+}
+.html-console > .warn {
+    background-color: rgb(248, 255, 147);
+}
+.html-console > .warn > span {
+    color: rgb(80, 80, 0) !important;
+}
+.html-console > .error {
+    background-color: rgb(236, 143, 143);
+}
+.html-console > .error > span {
+    color: rgb(100, 0, 0) !important;
+}
+.html-console > .log > .number, .html-console > .log > .object {
+    color: rgb(50, 150, 60);
+} 
+.html-console > .log > .function {
+    color: rgb(37, 37, 137);
+}
