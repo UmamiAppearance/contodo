@@ -13,11 +13,12 @@ class HTMLog {
         this.options = {
             autostart: (options.autostart) ? Boolean(options.autostart) : true,
             height: (options.height) ? options.height : "inherit",
-            width: (options.width) ? options.width : "inherit",
-            name: (options.name) ? options.name : "html-console",
             maxEntries: (options.maxEntries) ? Math.max(parseInt(Number(options.maxEntries), 10), 0) : 0,
+            name: (options.name) ? options.name : "html-console",
+            preventDefault: (options.preventDefault) ? Boolean(options.preventDefault) : false,
             reversed: (options.reversed) ? Boolean(options.reversed) : false,
-            style: (options.style) ? options.style : "default"
+            style: (options.style) ? options.style : "default",
+            width: (options.width) ? options.width : "inherit"
         }
         
         this.defaultConsole = {
@@ -27,24 +28,28 @@ class HTMLog {
             table: console.table ? console.table.bind(console) : null
         }
    
-        this.consoleHasTable = (typeof this.defaultConsole.table === "function");
-        this.documentReady = false;
         this.active = false;
-        this.logCount = 0;
-        this.style = null;
+        this.consoleHasTable = (typeof this.defaultConsole.table === "function");
         this.mainElem = null;
+        this.style = null;
+
         this.catchErrorFN = this.catchErrorFN.bind(this);
 
         if (this.options.autostart) {
-            this.initDocumentNode();
+            this.createDocumentNode();
             this.initFunctions();
         }
     }
 
-    initDocumentNode() {
+    createDocumentNode() {
         if (!this.mainElem) {
-            this.mainElem = this.createMain(this.options.name, this.options.style);
+            this.mainElem = document.createElement("code");
+            this.mainElem.id = this.options.name;
+            this.parentNode.append(this.mainElem);
+            this.mainElem.classList.add(this.options.name);
+            this.mainElem.classList.add(this.options.style);
             this.mainElem.style.height = this.options.height;
+            this.logCount = 0;
         }
         this.applyCSS();
     }
@@ -117,25 +122,13 @@ class HTMLog {
         this.style = null;
     }
 
-    createMain(id, style) {
-        let mainElem = document.getElementById(id);
-        if (!mainElem) {
-            mainElem = document.createElement("code");
-            mainElem.id = id;
-            this.parentNode.append(mainElem);
-            mainElem.classList.add(id);
-            mainElem.classList.add(style);
-        }
-        return mainElem;
-    }
-
-    makeLog(type, args, preventDefault=false) {
+    makeLog(type, args, preventDefaultLog=this.options.preventDefault) {
         const infoAdder = {
             error: "🚫",
             warn: "⚠️"
         }
 
-        if (!preventDefault) {
+        if (!preventDefaultLog) {
             this.defaultConsole[type](...args);
         }
         if (type !== "log") {
@@ -143,11 +136,11 @@ class HTMLog {
             this.addInfo = type; 
         }
 
-        this.printToDiv(type, ...args);
+        this.logToHTML(type, ...args);
     }
 
-    makeTableLog(args) {
-        if (this.consoleHasTable) {
+    makeTableLog(args, preventDefaultLog=this.options.preventDefault) {
+        if (!preventDefaultLog && this.consoleHasTable) {
             this.defaultConsole.table(...args);
         }
 
@@ -156,7 +149,7 @@ class HTMLog {
         [data, cols] = args;
 
         if (!isIterable(data)) {
-            this.printToDiv("log", data);
+            this.logToHTML("log", data);
         } 
         
         else {
@@ -205,11 +198,11 @@ class HTMLog {
                 tData.push(rowArray);
             }
             
-            this.printTable(tData, header);
+            this.logHTMLTable(tData, header);
         }
     }
 
-    makeDivEntry(className="log") {        
+    makeDivLogEntry(className="log") {        
         let log = document.createElement("div");
         log.classList.add("log", className);
         log.dataset.date = new Date().toISOString();
@@ -242,8 +235,8 @@ class HTMLog {
         return span;
     }
 
-    printToDiv(type, ...args) {
-        const newLog = this.makeDivEntry(type);
+    logToHTML(type, ...args) {
+        const newLog = this.makeDivLogEntry(type);
         const start = (type === "log") ? 0 : 1;
         const last = args.length-1;
 
@@ -277,7 +270,7 @@ class HTMLog {
     }
 
 
-    printTable(data, header) {
+    logHTMLTable(data, header) {
         const table = document.createElement("table");
         
         const tHead = document.createElement("thead");
@@ -310,7 +303,7 @@ class HTMLog {
         table.append(tBody);
 
 
-        let divLog = this.makeDivEntry();
+        let divLog = this.makeDivLogEntry();
         divLog.append(table);
 
         table.scrollIntoView();
