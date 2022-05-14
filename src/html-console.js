@@ -1,5 +1,3 @@
-const MAIN_ELEMENT_NAME = "html-console";
-
 /**
  * Mirror console logs into a code tag.
  *
@@ -9,19 +7,18 @@ const MAIN_ELEMENT_NAME = "html-console";
 class HTMLog {
 
     constructor(node, options={}) {
+        
+        this.parentNode = (node) ? node : document.body;
+
         this.options = {
+            autostart: (options.autostart) ? Boolean(options.autostart) : true,
             height: (options.height) ? options.height : "inherit",
             width: (options.width) ? options.width : "inherit",
-            maxEntries: (options.maxEntries) ? options.maxEntries : 0,
-            reversed: (options.reversed) ? options.reversed : false,
-            style: (options.style) ? options.style : "default"  
+            name: (options.name) ? options.name : "html-console",
+            maxEntries: (options.maxEntries) ? Math.max(parseInt(Number(options.maxEntries), 10), 0) : 0,
+            reversed: (options.reversed) ? Boolean(options.reversed) : false,
+            style: (options.style) ? options.style : "default"
         }
-
-        this.parentNode = (node) ? node : document.body;
-        this.mainElem = this.createMain(MAIN_ELEMENT_NAME, this.options.style);
-        this.applyCSS();
-
-        this.mainElem.style.height = options.height;
         
         this.defaultConsole = {
             log: console.log.bind(console),
@@ -30,33 +27,94 @@ class HTMLog {
             table: console.table ? console.table.bind(console) : null
         }
    
+        this.consoleHasTable = (typeof this.defaultConsole.table === "function");
+        this.documentReady = false;
+        this.active = false;
+        this.logCount = 0;
+        this.style = null;
+        this.mainElem = null;
+        this.catchErrorFN = this.catchErrorFN.bind(this);
+
+        if (this.options.autostart) {
+            this.initDocumentNode();
+            this.initFunctions();
+        }
+    }
+
+    initDocumentNode() {
+        if (!this.mainElem) {
+            this.mainElem = this.createMain(this.options.name, this.options.style);
+            this.mainElem.style.height = this.options.height;
+        }
+        this.applyCSS();
+    }
+
+    destroyDocumentNode() {
+        if (this.active) {
+            this.restoreDefaultConsole();
+        }
+        if (!this.mainElem) {
+            return;
+        }
+        this.mainElem.remove();
+        this.mainElem = null;
+    }
+
+    initFunctions() {
+        if (this.active) {
+            return;
+        }
         console.log = (...args) => this.makeLog("log", args);
         console.error = (...args) => this.makeLog("error", args);    
         console.warn = (...args) => this.makeLog("warn", args);
         console.table = (...args) => this.makeTableLog(args);
-        this.consoleHasTable = (typeof this.defaultConsole.table === "function");
+        window.addEventListener("error", this.catchErrorFN, false);
+        this.active = true;
+    }
 
-        this.logCount = 0;
+    restoreDefaultConsole() {
+        if (!this.active) {
+            return;
+        }
+        console.log = this.defaultConsole.log;
+        console.error = this.defaultConsole.error;
+        console.warn = this.defaultConsole.warn;
+        console.table = this.defaultConsole.table;
+        window.removeEventListener("error", this.catchErrorFN, false);
+        this.active = false;
+    }
 
-        window.addEventListener("error", (err) => {
-            this.makeLog(
-                "error", 
-                [
-                    "Uncaught",
-                    err.message,
-                    "\n",
-                    `  > ${err.filename}`,
-                    "\n",
-                    `  > line ${err.lineno}, colum ${err.colno}`
-                ],
-                true);
-        });
+    catchErrorFN(err) {
+        this.makeLog(
+            "error", 
+            [
+                "Uncaught",
+                err.message,
+                "\n",
+                `  > ${err.filename}`,
+                "\n",
+                `  > line ${err.lineno}, colum ${err.colno}`
+            ],
+            true
+        );
     }
 
     applyCSS() {
-        const style = document.createElement("style");
-        style.append(document.createTextNode(CSS));
-        document.head.append(style);
+        if (this.style) {
+            return;
+        }
+        this.style = document.createElement("style");
+        const css = CSS.replaceAll("OPTIONS_NAME", this.options.name); 
+        this.style.append(document.createTextNode(css));
+        document.head.append(this.style);
+    }
+
+    removeCSS() {
+        if (!this.style) {
+            return;
+        }
+        this.style.remove();
+        this.style = null;
     }
 
     createMain(id, style) {
@@ -260,7 +318,7 @@ class HTMLog {
 }
 
 const CSS = `
-.${MAIN_ELEMENT_NAME} {
+.OPTIONS_NAME {
     position: inherit;
     display: block;
     font-family: monospace;
@@ -271,34 +329,34 @@ const CSS = `
     overflow: auto;
     margin: auto;
 }
-.${MAIN_ELEMENT_NAME}.default > .log {
+.OPTIONS_NAME.default > .log {
     border-color: rgba(157, 157, 157, 0.2);
     border-width: 0 0 1pt 0;
     border-style: solid;
     padding: 2px 5px;
 }
-.${MAIN_ELEMENT_NAME}.default > .log:first-child {
+.OPTIONS_NAME.default > .log:first-child {
     border-width: 1pt 0;
 }
-.${MAIN_ELEMENT_NAME}.default > .warn {
+.OPTIONS_NAME.default > .warn {
     background-color: rgb(248, 255, 147);
 }
-.${MAIN_ELEMENT_NAME}.default > .warn > span {
+.OPTIONS_NAME.default > .warn > span {
     color: rgb(80, 80, 0) !important;
 }
-.${MAIN_ELEMENT_NAME}.default > .error {
+.OPTIONS_NAME.default > .error {
     background-color: rgb(236, 143, 143);
 }
-.${MAIN_ELEMENT_NAME}.default > .error > span {
+.OPTIONS_NAME.default > .error > span {
     color: rgb(100, 0, 0) !important;
 }
-.${MAIN_ELEMENT_NAME}.default > .log > .number, .${MAIN_ELEMENT_NAME}.default > .log > .bigint, .${MAIN_ELEMENT_NAME}.default > .log > .object {
+.OPTIONS_NAME.default > .log > .number, .OPTIONS_NAME.default > .log > .bigint, .OPTIONS_NAME.default > .log > .object {
     color: rgb(50, 150, 60);
 } 
-.${MAIN_ELEMENT_NAME}.default > .log > .function, .${MAIN_ELEMENT_NAME}.default > .log > .object {
+.OPTIONS_NAME.default > .log > .function, .OPTIONS_NAME.default > .log > .object {
     color: rgb(37, 37, 137);
 }
-.${MAIN_ELEMENT_NAME}.default table {
+.OPTIONS_NAME.default table {
     width: 100%;
     text-align: right;
     border-spacing: 0;
@@ -306,13 +364,13 @@ const CSS = `
     border: 2px #333;
     border-style: solid none;
 }
-.${MAIN_ELEMENT_NAME}.default thead, .${MAIN_ELEMENT_NAME}.default th {
+.OPTIONS_NAME.default thead, .OPTIONS_NAME.default th {
     font-weight: 700;
 }
-.${MAIN_ELEMENT_NAME}.default thead > tr, .${MAIN_ELEMENT_NAME}.default tr:nth-child(even) {
+.OPTIONS_NAME.default thead > tr, .OPTIONS_NAME.default tr:nth-child(even) {
     background-color: rgba(200, 200, 220, 0.1);
 }
-.${MAIN_ELEMENT_NAME}.default th, .${MAIN_ELEMENT_NAME}.default td {
+.OPTIONS_NAME.default th, .OPTIONS_NAME.default td {
     padding: 3px 0;
     border: 1px solid rgba(157, 157, 157, 0.2);
 }
