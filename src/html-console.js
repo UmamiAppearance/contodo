@@ -145,6 +145,7 @@ class HTMLog {
         }
 
         const isIterable = (val) => (typeof val === 'object' || (Symbol.iterator in Object(val) && typeof val !== "string"));
+        
         let data, cols;
         [data, cols] = args;
 
@@ -231,7 +232,10 @@ class HTMLog {
     makeArgSpan(CSSClass, content) {
         const span = document.createElement("span");
         span.classList.add(CSSClass);
-        span.textContent = content.toString().replace(/\n/g, " ");
+        span.textContent = content.toString().replace(/\n/g, "");
+        if (span.textContent === "") {
+            span.textContent = " ";
+        } 
         return span;
     }
 
@@ -249,15 +253,54 @@ class HTMLog {
             let argType = typeof args[i];
             
             if (argType === "object") {
-                if (Array.isArray(args[i])) {
-                    args[i] = "Array []";
+                if (Array.isArray(args[i]) || (ArrayBuffer.isView(args[i]) && (args[i].constructor.name.match("Array")))) {
+                    const lastIndex = args[i].length - 1;
+                    newLog.append(this.makeArgSpan("object", `${args[i].constructor.name} [ `));
+                    
+                    args[i].forEach((subArg, i) => {
+                        let subType = typeof subArg;
+                        if (subType === "string") {
+                            subArg = `"${subArg}"`;
+                            subType = "array-string";
+                        }
+                        newLog.append(this.makeArgSpan(subType, subArg));
+                        if (i < lastIndex) {
+                            newLog.append(this.makeArgSpan("object", ", "));
+                        }
+                    });
+
+                    newLog.append(this.makeArgSpan("object", " ]"));
                 }
-            } else if (argType === "bigint") {
-                args[i] += "n";
-            } 
-            if (argType === "string" && args[i] === "\n") {
+
+                else if (ArrayBuffer.isView(args[i])) {
+                    newLog.append(this.makeArgSpan("object", "DataView { buffer: ArrayBuffer, byteLength: "));
+                    newLog.append(this.makeArgSpan("number", args[i].byteLength));
+                    newLog.append(this.makeArgSpan("object", ", byteOffset: "));
+                    newLog.append(this.makeArgSpan("number", args[i].byteOffset));
+                    newLog.append(this.makeArgSpan("object", " }"));
+                }
+
+                else if (args[i] === null) {
+                    newLog.append(this.makeArgSpan("null", "null"));
+                }
+                
+                else if (args[i].constructor.name === "ArrayBuffer") {
+                    newLog.append(this.makeArgSpan("object", "ArrayBuffer { byteLength: "));
+                    newLog.append(this.makeArgSpan("number", args[i].byteLength));
+                    newLog.append(this.makeArgSpan("object", " }"));
+                }
+            }
+            
+            else if (argType === "string" && args[i] === "\n") {
                 newLog.append(document.createTextNode("\n"));
-            } else {
+            }
+            
+            else {
+                if (argType === "bigint") {
+                    args[i] += "n";
+                } else if (isNaN(args[i])) {
+                    argType = "null";
+                }
                 newLog.append(this.makeArgSpan(argType, args[i]));
             }
 
@@ -343,11 +386,17 @@ const CSS = `
 .OPTIONS_NAME.default > .error > span {
     color: rgb(100, 0, 0) !important;
 }
-.OPTIONS_NAME.default > .log > .number, .OPTIONS_NAME.default > .log > .bigint, .OPTIONS_NAME.default > .log > .object {
+.OPTIONS_NAME.default > .log > .null {
+    color: rgb(127, 127, 127);
+}
+.OPTIONS_NAME.default > .log > .number, .OPTIONS_NAME.default > .log > .bigint, .OPTIONS_NAME.default > .log > .object, .OPTIONS_NAME.default > .log > .boolean {
     color: rgb(50, 150, 60);
-} 
+}
+.OPTIONS_NAME.default > .log > .array-string {
+    color: rgb(255, 0, 255);
+}
 .OPTIONS_NAME.default > .log > .function, .OPTIONS_NAME.default > .log > .object {
-    color: rgb(37, 37, 137);
+    color: rgb(40, 100, 250);
 }
 .OPTIONS_NAME.default table {
     width: 100%;
