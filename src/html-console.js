@@ -232,11 +232,101 @@ class HTMLog {
     makeArgSpan(CSSClass, content) {
         const span = document.createElement("span");
         span.classList.add(CSSClass);
-        span.textContent = content.toString().replace(/\n/g, "");
-        if (span.textContent === "") {
-            span.textContent = " ";
-        } 
+        span.textContent = content 
         return span;
+    }
+
+    analyzeInputMakeSpan(arg, argType, newLog) {
+        if (argType === "object") {
+            if (Array.isArray(arg) || (ArrayBuffer.isView(arg) && (arg.constructor.name.match("Array")))) {
+                const lastIndex = arg.length - 1;
+                newLog.append(this.makeArgSpan("object", `${arg.constructor.name} [ `));
+                
+                arg.forEach((subArg, i) => {
+                    let subType = typeof subArg;
+                    if (subType === "string") {
+                        subArg = `"${subArg}"`;
+                        subType = "array-string";
+                        newLog.append(this.makeArgSpan(subType, subArg));
+                    }
+
+                    else {
+                        this.analyzeInputMakeSpan(subArg, subType, newLog);
+                    }
+                    
+                    if (i < lastIndex) {
+                        newLog.append(this.makeArgSpan("object", ", "));
+                    }
+                });
+
+                newLog.append(this.makeArgSpan("object", " ]"));
+            }
+
+            else if (ArrayBuffer.isView(arg)) {
+                newLog.append(this.makeArgSpan("object", "DataView { buffer: ArrayBuffer, byteLength: "));
+                newLog.append(this.makeArgSpan("number", arg.byteLength));
+                newLog.append(this.makeArgSpan("object", ", byteOffset: "));
+                newLog.append(this.makeArgSpan("number", arg.byteOffset));
+                newLog.append(this.makeArgSpan("object", " }"));
+            }
+
+            else if (arg === null) {
+                newLog.append(this.makeArgSpan("null", "null"));
+            }
+            
+            else if (arg.constructor.name === "ArrayBuffer") {
+                newLog.append(this.makeArgSpan("object", "ArrayBuffer { byteLength: "));
+                newLog.append(this.makeArgSpan("number", arg.byteLength));
+                newLog.append(this.makeArgSpan("object", " }"));
+            }
+        }
+
+        else if (argType === "function") {
+            // https://stackoverflow.com/a/31194949
+            const fnStr = Function.toString.call(arg);
+            const params = fnStr
+                .replace(/\/\/.*$/mg,'')
+                .replace(/\s+/g, '')
+                .replace(/\/\*[^/*]*\*\//g, '')  
+                .split('){', 1)[0].replace(/^[^(]*\(/, '')  
+                .replace(/=[^,]+/g, '')  
+                .split(',').filter(Boolean)
+                .join(", ");
+            this.defaultConsole.log("params", params);
+            if (fnStr.match(/^class/)) {
+                newLog.append(this.makeArgSpan("function", `class ${arg.name} { constructor(`));
+                newLog.append(this.makeArgSpan("fn-args", params));
+                newLog.append(this.makeArgSpan("function", ") }"));
+            } else {
+                newLog.append(this.makeArgSpan("function", `function ${arg.name}(`));
+                newLog.append(this.makeArgSpan("fn-args", params));
+                newLog.append(this.makeArgSpan("function", ")"));
+            }
+        }
+
+        else if (argType === "undefined") {
+            newLog.append(this.makeArgSpan("null", "undefined"));
+        }
+
+        
+        else {
+            if (argType === "string" && arg === "") {
+                arg = "<empty string>";
+            }
+            
+            else if (argType === "bigint") {
+                arg += "n";
+            }
+            
+            else if (argType === "symbol") {
+                arg = arg.toString().replace("(", "(\"").replace(")", "\")");
+            }
+            
+            else if (isNaN(arg)) {
+                argType = "null";
+            }
+            newLog.append(this.makeArgSpan(argType, arg));
+        }
     }
 
     logToHTML(type, ...args) {
@@ -251,58 +341,8 @@ class HTMLog {
 
         for (let i=start; i<=last; i++) {
             let argType = typeof args[i];
-            
-            if (argType === "object") {
-                if (Array.isArray(args[i]) || (ArrayBuffer.isView(args[i]) && (args[i].constructor.name.match("Array")))) {
-                    const lastIndex = args[i].length - 1;
-                    newLog.append(this.makeArgSpan("object", `${args[i].constructor.name} [ `));
-                    
-                    args[i].forEach((subArg, i) => {
-                        let subType = typeof subArg;
-                        if (subType === "string") {
-                            subArg = `"${subArg}"`;
-                            subType = "array-string";
-                        }
-                        newLog.append(this.makeArgSpan(subType, subArg));
-                        if (i < lastIndex) {
-                            newLog.append(this.makeArgSpan("object", ", "));
-                        }
-                    });
 
-                    newLog.append(this.makeArgSpan("object", " ]"));
-                }
-
-                else if (ArrayBuffer.isView(args[i])) {
-                    newLog.append(this.makeArgSpan("object", "DataView { buffer: ArrayBuffer, byteLength: "));
-                    newLog.append(this.makeArgSpan("number", args[i].byteLength));
-                    newLog.append(this.makeArgSpan("object", ", byteOffset: "));
-                    newLog.append(this.makeArgSpan("number", args[i].byteOffset));
-                    newLog.append(this.makeArgSpan("object", " }"));
-                }
-
-                else if (args[i] === null) {
-                    newLog.append(this.makeArgSpan("null", "null"));
-                }
-                
-                else if (args[i].constructor.name === "ArrayBuffer") {
-                    newLog.append(this.makeArgSpan("object", "ArrayBuffer { byteLength: "));
-                    newLog.append(this.makeArgSpan("number", args[i].byteLength));
-                    newLog.append(this.makeArgSpan("object", " }"));
-                }
-            }
-            
-            else if (argType === "string" && args[i] === "\n") {
-                newLog.append(document.createTextNode("\n"));
-            }
-            
-            else {
-                if (argType === "bigint") {
-                    args[i] += "n";
-                } else if (isNaN(args[i])) {
-                    argType = "null";
-                }
-                newLog.append(this.makeArgSpan(argType, args[i]));
-            }
+            this.analyzeInputMakeSpan(args[i], argType, newLog);
 
             if (i !== last) {
                 newLog.append(this.makeArgSpan("space", " "));
@@ -392,7 +432,7 @@ const CSS = `
 .OPTIONS_NAME.default > .log > .number, .OPTIONS_NAME.default > .log > .bigint, .OPTIONS_NAME.default > .log > .object, .OPTIONS_NAME.default > .log > .boolean {
     color: rgb(50, 150, 60);
 }
-.OPTIONS_NAME.default > .log > .array-string {
+.OPTIONS_NAME.default > .log > .array-string, .OPTIONS_NAME.default > .log > .fn-args, .OPTIONS_NAME.default > .log > .symbol {
     color: rgb(255, 0, 255);
 }
 .OPTIONS_NAME.default > .log > .function, .OPTIONS_NAME.default > .log > .object {
