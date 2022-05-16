@@ -3,12 +3,13 @@
   "version": "0.1.0",
   "description": "Render console output to HTML",
   "browser": "scr/html-console.js",
+  "type": "module",
   "directories": {
     "example": "examples"
   },
   "scripts": {
     "lint": "eslint ./src/html-console.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "node test/node.mjs"
   },
   "repository": {
     "type": "git",
