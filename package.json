@@ -7,6 +7,7 @@
     "example": "examples"
   },
   "scripts": {
+    "lint": "eslint ./src/html-console.ls",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -22,5 +23,8 @@
   "bugs": {
     "url": "https://github.com/UmamiAppearance/HTMLConsole/issues"
   },
-  "homepage": "https://github.com/UmamiAppearance/HTMLConsole#readme"
+  "homepage": "https://github.com/UmamiAppearance/HTMLConsole#readme",
+  "devDependencies": {
+    "eslint": "^8.15.0"
+  }
 }

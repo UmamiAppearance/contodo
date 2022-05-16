@@ -2,7 +2,9 @@
 <html lang="">
     <head>
         <meta charset="utf-8">
-        <title></title>
+
+        <title>HTMLConsole - Demo Page</title>
+        
         <link href="https://umamiappearance.github.io/MSG/MSG.css" rel="stylesheet">
         <style>
             html {
@@ -49,7 +51,7 @@
     </head>
     <body>
         <header>
-            <h1>HTMLConsole</h1>
+            <h1>HTMLConsole Demo Page</h1>
             <p>Open your Developer Tools and try it out...</p>
         </header>
 
@@ -75,14 +77,14 @@
         </footer>
 
     </body>
-
-    <script src="../src/html-console.js"></script>
     
-    <script>
+    <script type="module">
+        import { HTMLConsole } from "../src/html-console.js";
+
         const options = {
             height: "360px"
         }
-        const htmlConsole = new HTMLog(document.querySelector("fieldset"), options);
+        const htmlConsole = new HTMLConsole(document.querySelector("fieldset"), options);
         
         const firstInput = document.querySelector("#first-input");
         

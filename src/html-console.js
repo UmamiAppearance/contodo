@@ -4,9 +4,8 @@
  * Inspired by:
  *  - https://github.com/bahmutov/console-log-div
  *  - https://gist.githubusercontent.com/axelpale/27c9c216116bd591b1b89c0c91dd62a0/raw/fa6fc8d3825d70936213b57d1bb96e01c74727d8/ghoulog.js
- */ 
-class HTMLog {
-
+ */
+class HTMLConsole {
     constructor(node, options={}) {
         
         this.parentNode = (node) ? node : document.body;
@@ -21,14 +20,14 @@ class HTMLog {
             reversed: (options.reversed) ? Boolean(options.reversed) : false,
             style: (options.style) ? options.style : "default",
             width: (options.width) ? options.width : "inherit"
-        }
+        };
         
         this.defaultConsole = {
             log: console.log.bind(console),
             error: console.error.bind(console),
             warn: console.warn.bind(console),
             table: console.table ? console.table.bind(console) : null
-        }
+        };
    
         this.active = false;
         this.consoleHasTable = (typeof this.defaultConsole.table === "function");
@@ -127,7 +126,7 @@ class HTMLog {
         const infoAdder = {
             error: "🚫",
             warn: "⚠️"
-        }
+        };
 
         if (!preventDefaultLog) {
             this.defaultConsole[type](...args);
@@ -145,7 +144,7 @@ class HTMLog {
             this.defaultConsole.table(...args);
         }
 
-        const isIterable = (val) => (typeof val === 'object' || (Symbol.iterator in Object(val) && typeof val !== "string"));
+        const isIterable = (val) => (typeof val === "object" || (Symbol.iterator in Object(val) && typeof val !== "string"));
         
         let data, cols;
         [data, cols] = args;
@@ -155,7 +154,6 @@ class HTMLog {
         } 
         
         else {
-            const rows = Object.keys(data);
             if (typeof data !== "object") {
                 data = Object.assign({}, data);
             }
@@ -233,7 +231,7 @@ class HTMLog {
     makeEntrySpan(CSSClass, content) {
         const span = document.createElement("span");
         span.classList.add(CSSClass);
-        span.textContent = content 
+        span.textContent = content;
         return span;
     }
 
@@ -305,12 +303,12 @@ class HTMLog {
             
             else {
                 paramArray = fnStr
-                    .replace(/\/\/.*$/mg,'')                    // strip single-line comments
-                    .replace(/\s+/g, '')                        // strip white space
-                    .replace(/\/\*[^/*]*\*\//g, '')             // strip multi-line comments  
-                    .split('){', 1)[0].replace(/^[^(]*\(/, '')  // extract the parameters
-                    .replace(/=[^,]+/g, '')                     // strip any ES6 defaults 
-                    .split(',')                                 // split parameters
+                    .replace(/\/\/.*$/mg,"")                    // strip single-line comments
+                    .replace(/\s+/g, "")                        // strip white space
+                    .replace(/\/\*[^/*]*\*\//g, "")             // strip multi-line comments  
+                    .split("){", 1)[0].replace(/^[^(]*\(/, "")  // extract the parameters
+                    .replace(/=[^,]+/g, "")                     // strip any ES6 defaults 
+                    .split(",")                                 // split parameters
                     .filter(Boolean);                           // filter [""]
             }
  
@@ -493,4 +491,6 @@ const CSS = `
     padding: 3px 0;
     border: 1px solid rgba(157, 157, 157, 0.2);
 }
-`
+`;
+
+export { HTMLConsole };
