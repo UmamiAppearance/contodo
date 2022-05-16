@@ -1,0 +1,26 @@
+{
+  "name": "html-console",
+  "version": "0.1.0",
+  "description": "Render console output to HTML",
+  "browser": "scr/html-console.js",
+  "directories": {
+    "example": "examples"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/UmamiAppearance/HTMLConsole.git"
+  },
+  "keywords": [
+    "console",
+    "html"
+  ],
+  "author": "UmamiAppearance",
+  "license": "GPL-3.0-or-later",
+  "bugs": {
+    "url": "https://github.com/UmamiAppearance/HTMLConsole/issues"
+  },
+  "homepage": "https://github.com/UmamiAppearance/HTMLConsole#readme"
+}

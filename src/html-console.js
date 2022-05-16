@@ -1,8 +1,9 @@
 /**
  * Mirror console logs into a code tag.
  *
- * Started as a fork from:
- * https://gist.githubusercontent.com/axelpale/27c9c216116bd591b1b89c0c91dd62a0/raw/fa6fc8d3825d70936213b57d1bb96e01c74727d8/ghoulog.js
+ * Inspired by:
+ *  - https://github.com/bahmutov/console-log-div
+ *  - https://gist.githubusercontent.com/axelpale/27c9c216116bd591b1b89c0c91dd62a0/raw/fa6fc8d3825d70936213b57d1bb96e01c74727d8/ghoulog.js
  */ 
 class HTMLog {
 
