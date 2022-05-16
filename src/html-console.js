@@ -365,17 +365,21 @@ class HTMLog {
             newLog.append(this.makeEntrySpan("space", " "));
         }
 
-        for (let i=start; i<=last; i++) {
-            let argType = typeof args[i];
+        if (last < 0) {
+            newLog.append(this.makeEntrySpan("space", " "));
+        }  else {
+            for (let i=start; i<=last; i++) {
+                let argType = typeof args[i];
 
-            this.analyzeInputMakeSpan(args[i], argType, newLog);
+                this.analyzeInputMakeSpan(args[i], argType, newLog);
 
-            if (i !== last) {
-                newLog.append(this.makeEntrySpan("space", " "));
+                if (i !== last) {
+                    newLog.append(this.makeEntrySpan("space", " "));
+                }
             }
-
-            newLog.scrollIntoView();
         }
+
+        newLog.scrollIntoView();
     }
 
 
