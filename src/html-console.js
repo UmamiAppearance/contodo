@@ -1,7 +1,7 @@
 /**
  * Mirror console logs into a code tag.
  *
- * Based on:
+ * Started as a fork from:
  * https://gist.githubusercontent.com/axelpale/27c9c216116bd591b1b89c0c91dd62a0/raw/fa6fc8d3825d70936213b57d1bb96e01c74727d8/ghoulog.js
  */ 
 class HTMLog {
@@ -336,8 +336,11 @@ class HTMLog {
 
         
         else {
-            if (argType === "string" && arg === "") {
-                arg = "<empty string>";
+            if (argType === "string") {
+                if (arg === "") {
+                    arg = "<empty string>";
+                }
+                // pass
             }
             
             else if (argType === "bigint") {
@@ -490,4 +493,3 @@ const CSS = `
     border: 1px solid rgba(157, 157, 157, 0.2);
 }
 `
-// FIXME: correct string class selection
