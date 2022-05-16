@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="">
+    <head>
+        <meta charset="utf-8">
+        <title></title>
+        <link href="https://umamiappearance.github.io/MSG/MSG.css" rel="stylesheet">
+        <style>
+            code#first-input {
+                white-space: break-spaces;
+                height: 40px;
+                border-radius: 4px;
+                display: block;
+                padding: 5px;
+                margin: 20px auto;
+                width: 300px;
+                opacity: 1;
+                transition: opacity 2000ms;
+                cursor: not-allowed;
+            }
+        </style>
+    </head>
+    <body>
+      <header style="text-align: center;">
+        <h1>HTMLConsole</h1>
+        <p>Open your Developer Tools and try it out...</p>
+      </header>
+      <main>
+        
+        <code id="first-input"></code>
+        
+        <fieldset style="border-radius: 4px; max-width: 600px; margin: auto;">
+          <legend>&nbsp;console output&nbsp;</legend>
+        </fieldset>
+
+      </main>
+      <div id="tese"></div>
+    </body>
+    <script src="../src/html-console.js"></script>
+    <script>
+        const options = {
+            height: "360px"
+        }
+        const htmlConsole = new HTMLog(document.querySelector("fieldset"), options);
+        
+        const firstInput = document.querySelector("#first-input");
+        
+        firstInput.textContent = ">> ";
+        const helloWorld = 'console.log("Hello World!")'.split('');
+        
+        const enterCommand = () => {
+            firstInput.textContent += helloWorld.shift();
+            if (helloWorld.length) {
+                setTimeout(enterCommand, Math.floor(Math.random() * 100 + 100));
+            } else {
+                firstInput.textContent += "\n>> ";
+                setTimeout(() => {
+                    console.log("Hello World!");
+                }, 200);
+                setTimeout(() => {
+                    firstInput.style.opacity = "0.3";
+                }, 700);
+            }
+        }
+        enterCommand();
+
+    </script>
+</html>

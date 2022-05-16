@@ -11,6 +11,7 @@ class HTMLog {
         this.parentNode = (node) ? node : document.body;
 
         this.options = {
+            applyCSS: (options.applyCSS) ? Boolean(options.applyCSS) : true,
             autostart: (options.autostart) ? Boolean(options.autostart) : true,
             height: (options.height) ? options.height : "inherit",
             maxEntries: (options.maxEntries) ? Math.max(parseInt(Number(options.maxEntries), 10), 0) : 0,
@@ -44,14 +45,14 @@ class HTMLog {
     createDocumentNode() {
         if (!this.mainElem) {
             this.mainElem = document.createElement("code");
-            this.mainElem.id = this.options.name;
             this.parentNode.append(this.mainElem);
-            this.mainElem.classList.add(this.options.name);
-            this.mainElem.classList.add(this.options.style);
+            this.mainElem.classList.add("html-console", this.options.name, this.options.style);
             this.mainElem.style.height = this.options.height;
             this.logCount = 0;
         }
-        this.applyCSS();
+        if (this.options.applyCSS) {
+            this.applyCSS();
+        }
     }
 
     destroyDocumentNode() {
@@ -108,9 +109,8 @@ class HTMLog {
         if (this.style) {
             return;
         }
-        this.style = document.createElement("style");
-        const css = CSS.replaceAll("OPTIONS_NAME", this.options.name); 
-        this.style.append(document.createTextNode(css));
+        this.style = document.createElement("style"); 
+        this.style.append(document.createTextNode(CSS));
         document.head.append(this.style);
     }
 
@@ -424,7 +424,7 @@ class HTMLog {
 }
 
 const CSS = `
-.OPTIONS_NAME {
+.html-console {
     position: inherit;
     display: block;
     font-family: monospace;
@@ -434,41 +434,44 @@ const CSS = `
     white-space: break-spaces;
     overflow: auto;
     margin: auto;
+    background-color: #fff;
+    color: black;
+    padding: 1px;
 }
-.OPTIONS_NAME.default > .log {
+.html-console.default > .log {
     border-color: rgba(157, 157, 157, 0.2);
     border-width: 0 0 1pt 0;
     border-style: solid;
     padding: 2px 5px;
 }
-.OPTIONS_NAME.default > .log:first-child {
+.html-console.default > .log:first-child {
     border-width: 1pt 0;
 }
-.OPTIONS_NAME.default > .warn {
+.html-console.default > .warn {
     background-color: rgb(248, 255, 147);
 }
-.OPTIONS_NAME.default > .warn > span {
+.html-console.default > .warn > span {
     color: rgb(80, 80, 0) !important;
 }
-.OPTIONS_NAME.default > .error {
+.html-console.default > .error {
     background-color: rgb(236, 143, 143);
 }
-.OPTIONS_NAME.default > .error > span {
+.html-console.default > .error > span {
     color: rgb(100, 0, 0) !important;
 }
-.OPTIONS_NAME.default > .log > .null {
+.html-console.default > .log > .null {
     color: rgb(127, 127, 127);
 }
-.OPTIONS_NAME.default > .log > .number, .OPTIONS_NAME.default > .log > .bigint, .OPTIONS_NAME.default > .log > .object, .OPTIONS_NAME.default > .log > .boolean {
+.html-console.default > .log > .number, .html-console.default > .log > .bigint, .html-console.default > .log > .object, .html-console.default > .log > .boolean {
     color: rgb(50, 150, 60);
 }
-.OPTIONS_NAME.default > .log > .array-string, .OPTIONS_NAME.default > .log > .fn-args, .OPTIONS_NAME.default > .log > .symbol {
+.html-console.default > .log > .array-string, .html-console.default > .log > .fn-args, .html-console.default > .log > .symbol {
     color: rgb(255, 0, 255);
 }
-.OPTIONS_NAME.default > .log > .function, .OPTIONS_NAME.default > .log > .object {
+.html-console.default > .log > .function, .html-console.default > .log > .object {
     color: rgb(40, 100, 250);
 }
-.OPTIONS_NAME.default table {
+.html-console.default table {
     width: 100%;
     text-align: right;
     border-spacing: 0;
@@ -476,14 +479,15 @@ const CSS = `
     border: 2px #333;
     border-style: solid none;
 }
-.OPTIONS_NAME.default thead, .OPTIONS_NAME.default th {
+.html-console.default thead, .html-console.default th {
     font-weight: 700;
 }
-.OPTIONS_NAME.default thead > tr, .OPTIONS_NAME.default tr:nth-child(even) {
+.html-console.default thead > tr, .html-console.default tr:nth-child(even) {
     background-color: rgba(200, 200, 220, 0.1);
 }
-.OPTIONS_NAME.default th, .OPTIONS_NAME.default td {
+.html-console.default th, .html-console.default td {
     padding: 3px 0;
     border: 1px solid rgba(157, 157, 157, 0.2);
 }
 `
+// FIXME: correct string class selection
