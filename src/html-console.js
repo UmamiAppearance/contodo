@@ -229,7 +229,7 @@ class HTMLog {
         return log;
     }
 
-    makeArgSpan(CSSClass, content) {
+    makeEntrySpan(CSSClass, content) {
         const span = document.createElement("span");
         span.classList.add(CSSClass);
         span.textContent = content 
@@ -240,14 +240,14 @@ class HTMLog {
         if (argType === "object") {
             if (Array.isArray(arg) || (ArrayBuffer.isView(arg) && (arg.constructor.name.match("Array")))) {
                 const lastIndex = arg.length - 1;
-                newLog.append(this.makeArgSpan("object", `${arg.constructor.name} [ `));
+                newLog.append(this.makeEntrySpan("object", `${arg.constructor.name} [ `));
                 
                 arg.forEach((subArg, i) => {
                     let subType = typeof subArg;
                     if (subType === "string") {
                         subArg = `"${subArg}"`;
                         subType = "array-string";
-                        newLog.append(this.makeArgSpan(subType, subArg));
+                        newLog.append(this.makeEntrySpan(subType, subArg));
                     }
 
                     else {
@@ -255,57 +255,83 @@ class HTMLog {
                     }
                     
                     if (i < lastIndex) {
-                        newLog.append(this.makeArgSpan("object", ", "));
+                        newLog.append(this.makeEntrySpan("object", ", "));
                     }
                 });
 
-                newLog.append(this.makeArgSpan("object", " ]"));
+                newLog.append(this.makeEntrySpan("object", " ]"));
             }
 
             else if (ArrayBuffer.isView(arg)) {
-                newLog.append(this.makeArgSpan("object", "DataView { buffer: ArrayBuffer, byteLength: "));
-                newLog.append(this.makeArgSpan("number", arg.byteLength));
-                newLog.append(this.makeArgSpan("object", ", byteOffset: "));
-                newLog.append(this.makeArgSpan("number", arg.byteOffset));
-                newLog.append(this.makeArgSpan("object", " }"));
+                newLog.append(this.makeEntrySpan("object", "DataView { buffer: ArrayBuffer, byteLength: "));
+                newLog.append(this.makeEntrySpan("number", arg.byteLength));
+                newLog.append(this.makeEntrySpan("object", ", byteOffset: "));
+                newLog.append(this.makeEntrySpan("number", arg.byteOffset));
+                newLog.append(this.makeEntrySpan("object", " }"));
             }
 
             else if (arg === null) {
-                newLog.append(this.makeArgSpan("null", "null"));
+                newLog.append(this.makeEntrySpan("null", "null"));
             }
             
             else if (arg.constructor.name === "ArrayBuffer") {
-                newLog.append(this.makeArgSpan("object", "ArrayBuffer { byteLength: "));
-                newLog.append(this.makeArgSpan("number", arg.byteLength));
-                newLog.append(this.makeArgSpan("object", " }"));
+                newLog.append(this.makeEntrySpan("object", "ArrayBuffer { byteLength: "));
+                newLog.append(this.makeEntrySpan("number", arg.byteLength));
+                newLog.append(this.makeEntrySpan("object", " }"));
             }
         }
 
         else if (argType === "function") {
-            // https://stackoverflow.com/a/31194949
-            const fnStr = Function.toString.call(arg);
-            const params = fnStr
-                .replace(/\/\/.*$/mg,'')
-                .replace(/\s+/g, '')
-                .replace(/\/\*[^/*]*\*\//g, '')  
-                .split('){', 1)[0].replace(/^[^(]*\(/, '')  
-                .replace(/=[^,]+/g, '')  
-                .split(',').filter(Boolean)
-                .join(", ");
-            this.defaultConsole.log("params", params);
-            if (fnStr.match(/^class/)) {
-                newLog.append(this.makeArgSpan("function", `class ${arg.name} { constructor(`));
-                newLog.append(this.makeArgSpan("fn-args", params));
-                newLog.append(this.makeArgSpan("function", ") }"));
+            // cf. https://stackoverflow.com/a/31194949
+            let fnStr = Function.toString.call(arg);
+            const isClass = Boolean(fnStr.match(/^class/));
+            let hasConstructor = true;
+            let paramArray;
+            
+            if (fnStr.match("=>")) {
+                paramArray = fnStr
+                    .replace(/\s+/g, "")                        // remove all whitespace
+                    .replace(/=>.*/, "")                        // remove everything after the arrow
+                    .replace(/(\(|\))/g, "")                    // remove brackets
+                    .split(",")                                 // split parameters
+                    .filter(Boolean);                           // filter [""]
+            }
+            
+            else if (isClass && !fnStr.match("constructor")) {
+                hasConstructor = false;
+                paramArray = [];
+            }
+            
+            else {
+                paramArray = fnStr
+                    .replace(/\/\/.*$/mg,'')                    // strip single-line comments
+                    .replace(/\s+/g, '')                        // strip white space
+                    .replace(/\/\*[^/*]*\*\//g, '')             // strip multi-line comments  
+                    .split('){', 1)[0].replace(/^[^(]*\(/, '')  // extract the parameters
+                    .replace(/=[^,]+/g, '')                     // strip any ES6 defaults 
+                    .split(',')                                 // split parameters
+                    .filter(Boolean);                           // filter [""]
+            }
+ 
+            const params = paramArray.join(", ");
+            
+            if (isClass) {
+                if (hasConstructor) {
+                    newLog.append(this.makeEntrySpan("function", `class ${arg.name} { constructor(`));
+                    newLog.append(this.makeEntrySpan("fn-args", params));
+                    newLog.append(this.makeEntrySpan("function", ") }"));
+                } else {
+                    newLog.append(this.makeEntrySpan("function", `class ${arg.name} {}`));
+                }
             } else {
-                newLog.append(this.makeArgSpan("function", `function ${arg.name}(`));
-                newLog.append(this.makeArgSpan("fn-args", params));
-                newLog.append(this.makeArgSpan("function", ")"));
+                newLog.append(this.makeEntrySpan("function", `function ${arg.name}(`));
+                newLog.append(this.makeEntrySpan("fn-args", params));
+                newLog.append(this.makeEntrySpan("function", ")"));
             }
         }
 
         else if (argType === "undefined") {
-            newLog.append(this.makeArgSpan("null", "undefined"));
+            newLog.append(this.makeEntrySpan("null", "undefined"));
         }
 
         
@@ -325,7 +351,7 @@ class HTMLog {
             else if (isNaN(arg)) {
                 argType = "null";
             }
-            newLog.append(this.makeArgSpan(argType, arg));
+            newLog.append(this.makeEntrySpan(argType, arg));
         }
     }
 
@@ -335,8 +361,8 @@ class HTMLog {
         const last = args.length-1;
 
         if (start === 1) {
-            newLog.append(this.makeArgSpan("info", args[0]));
-            newLog.append(this.makeArgSpan("space", " "));
+            newLog.append(this.makeEntrySpan("info", args[0]));
+            newLog.append(this.makeEntrySpan("space", " "));
         }
 
         for (let i=start; i<=last; i++) {
@@ -345,7 +371,7 @@ class HTMLog {
             this.analyzeInputMakeSpan(args[i], argType, newLog);
 
             if (i !== last) {
-                newLog.append(this.makeArgSpan("space", " "));
+                newLog.append(this.makeEntrySpan("space", " "));
             }
 
             newLog.scrollIntoView();
