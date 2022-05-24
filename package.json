@@ -9,7 +9,7 @@
   },
   "scripts": {
     "lint": "eslint ./src/html-console.js",
-    "test": "node test/node.mjs"
+    "test": "node ./test/test.js"
   },
   "repository": {
     "type": "git",
@@ -27,6 +27,6 @@
   "homepage": "https://github.com/UmamiAppearance/HTMLConsole#readme",
   "devDependencies": {
     "eslint": "^8.15.0",
-    "puppeteer": "^14.1.0"
+    "no-bro-cote": "^0.1.0"
   }
 }
