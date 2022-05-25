@@ -278,6 +278,39 @@ class HTMLConsole {
                 newLog.append(this.makeEntrySpan("number", arg.byteLength));
                 newLog.append(this.makeEntrySpan("object", " }"));
             }
+
+            else if (arg === Object(arg)) {
+                newLog.append(this.makeEntrySpan("object", "Object { "));
+                
+                const objEntries = Object.entries(arg);
+                const lastIndex = objEntries.length - 1;
+                objEntries.forEach((entry, i) => {
+                    entry.forEach((subArg, j) => {
+                        let subType = typeof subArg;
+                        if (subType === "string") {
+                            subArg = `"${subArg}"`;
+                            subType = "array-string";
+                            newLog.append(this.makeEntrySpan(subType, subArg));
+                        }
+
+                        else {
+                            this.analyzeInputMakeSpan(subArg, subType, newLog);
+                        }
+
+                        if (!j) {
+                            newLog.append(this.makeEntrySpan("object", ": "));
+                        }
+                    });
+                    
+                    if (i < lastIndex) {
+                        newLog.append(this.makeEntrySpan("object", ", "));
+                    }
+
+                });
+
+                newLog.append(this.makeEntrySpan("object", " }"));
+
+            }
         }
 
         else if (argType === "function") {
