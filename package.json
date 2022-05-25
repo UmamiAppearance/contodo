@@ -27,6 +27,6 @@
   "homepage": "https://github.com/UmamiAppearance/HTMLConsole#readme",
   "devDependencies": {
     "eslint": "^8.15.0",
-    "no-bro-cote": "^0.1.0"
+    "no-bro-cote": "^0.1.1"
   }
 }

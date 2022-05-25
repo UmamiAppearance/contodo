@@ -1,4 +1,4 @@
-import { NoBroCote } from "no-bro-cote";
+import NoBroCote from "no-bro-cote";
 
 const test = new NoBroCote(import.meta.url);
 
@@ -8,6 +8,7 @@ test.makeUnit(
     "logTest",
     "test",
     () => {
+        const logInput = "test";
         // eslint-disable-next-line no-undef
         const htmlConsole = new HTMLConsole();
         console.log(logInput);
