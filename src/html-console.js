@@ -1,4 +1,4 @@
-import isIdentifier from "./is-identifier.js";
+import { isIdentifier, isPositiveInteger } from "./utils.js";
 import defaultCSS from "./default-css.js";
 
 /**
@@ -289,9 +289,13 @@ class HTMLConsole {
                     entry.forEach((subArg, j) => {
                         let subType = typeof subArg;
                         if (subType === "string") {
-                            if (!j && ((Number.isInteger(Number(subArg) && Number(subArg) > 0)) || isIdentifier(subArg))) {
-                                // TODO: not working correctly an color for arg 0 is always blue, even str
-                                subType = "object";  
+                            if (!j) {
+                                subType = "object";
+                                if (isPositiveInteger(subArg)) {
+                                    subArg = Number(subArg).toString();
+                                } else if (!isIdentifier(subArg)) {
+                                    subArg = `"${subArg}"`;
+                                }
                             } else {
                                 subArg = `"${subArg}"`;
                                 subType = "array-string";
@@ -311,11 +315,13 @@ class HTMLConsole {
                     if (i < lastIndex) {
                         newLog.append(this.makeEntrySpan("object", ", "));
                     }
-
                 });
-
                 newLog.append(this.makeEntrySpan("object", " }"));
-
+            }
+            
+            else {
+                this.defaultConsole.error("You found an edge case, which is not covered yet.\nPlease create an issue mentioning your input at:\nhttps://github.com/UmamiAppearance/HTMLConsole/issues");
+                newLog.append(this.makeEntrySpan("string", arg));
             }
         }
 

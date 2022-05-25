@@ -1,5 +1,5 @@
 /**
- * The original of this beauty can be admired here:
+ * The original of this beast can be admired here:
  * https://stackoverflow.com/a/9337047
  * 
  * For objects it is legal to use "const, if, ..."
@@ -14,4 +14,13 @@ const isIdentifier = (str) => {
     return Boolean(match);
 };
 
-export default isIdentifier;
+
+const isPositiveInteger = (input) => {
+    input = Number(input);
+    if (isNaN(input)) {
+        return false;
+    }
+    return (Number.isInteger(input) && input > 0);
+};
+
+export { isIdentifier, isPositiveInteger };
