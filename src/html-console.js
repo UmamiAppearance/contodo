@@ -1,3 +1,6 @@
+
+import isIdentifier from "./is-identifier.js";
+
 /**
  * Mirror console logs into a code tag.
  *
@@ -288,8 +291,12 @@ class HTMLConsole {
                     entry.forEach((subArg, j) => {
                         let subType = typeof subArg;
                         if (subType === "string") {
-                            subArg = `"${subArg}"`;
-                            subType = "array-string";
+                            if (!j && isIdentifier(subArg)) {
+                                subType = "object";  
+                            } else {
+                                subArg = `"${subArg}"`;
+                                subType = "array-string";
+                            }
                             newLog.append(this.makeEntrySpan(subType, subArg));
                         }
 
