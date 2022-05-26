@@ -1,3 +1,11 @@
+/*
+ * [HTMLConsole]{@link https://github.com/UmamiAppearance/HTMLConsole}
+ *
+ * @version 0.1.0
+ * @author UmamiAppearance [mail@umamiappearance.eu]
+ * @license GPL-3.0
+ */
+
 import { isIdentifier, isPositiveInteger } from "./utils.js";
 import defaultCSS from "./default-css.js";
 
@@ -11,16 +19,19 @@ class HTMLConsole {
         
         this.parentNode = (node) ? node : document.body;
 
+        const hasOption = (key) => Object.prototype.hasOwnProperty.call(options, key);
+
         this.options = {
-            applyCSS: (options.applyCSS) ? Boolean(options.applyCSS) : true,
-            autostart: (options.autostart) ? Boolean(options.autostart) : true,
-            height: (options.height) ? options.height : "inherit",
-            maxEntries: (options.maxEntries) ? Math.max(parseInt(Number(options.maxEntries), 10), 0) : 0,
-            name: (options.name) ? options.name : "html-console",
-            preventDefault: (options.preventDefault) ? Boolean(options.preventDefault) : false,
-            reversed: (options.reversed) ? Boolean(options.reversed) : false,
-            style: (options.style) ? options.style : "default",
-            width: (options.width) ? options.width : "inherit"
+            applyCSS: hasOption("applyCSS") ? Boolean(options.applyCSS) : true,
+            autostart: hasOption("autostart") ? Boolean(options.autostart) : true,
+            catchErrors: hasOption("catchErrors") ? Boolean(options.catchErrors) : false,
+            height: hasOption("height") ? options.height : "inherit",
+            maxEntries: hasOption("maxEntries") ? Math.max(parseInt(Number(options.maxEntries), 10), 0) : 0,
+            name: hasOption("name") ? options.name : "html-console",
+            preventDefault: hasOption("preventDefault") ? Boolean(options.preventDefault) : false,
+            reversed: hasOption("reversed") ? Boolean(options.reversed) : false,
+            style: hasOption("style") ? options.style : "default",
+            width: hasOption("width") ? options.width : "inherit"
         };
         
         this.defaultConsole = {
@@ -75,7 +86,7 @@ class HTMLConsole {
         console.error = (...args) => this.makeLog("error", args);    
         console.warn = (...args) => this.makeLog("warn", args);
         console.table = (...args) => this.makeTableLog(args);
-        window.addEventListener("error", this.catchErrorFN, false);
+        if (this.options.catchErrors) window.addEventListener("error", this.catchErrorFN, false);
         this.active = true;
     }
 
@@ -125,7 +136,7 @@ class HTMLConsole {
 
     makeLog(type, args, preventDefaultLog=this.options.preventDefault) {
         const infoAdder = {
-            error: "🚫",
+            error: "⛔",
             warn: "⚠️"
         };
 

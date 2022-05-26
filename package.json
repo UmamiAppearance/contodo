@@ -5,10 +5,12 @@
   "browser": "scr/html-console.js",
   "type": "module",
   "directories": {
-    "example": "examples"
+    "example": "./examples",
+    "src": "./src",
+    "test": "./test"
   },
   "scripts": {
-    "lint": "eslint ./src/html-console.js",
+    "lint": "eslint ./src/",
     "test": "node ./test/test.js"
   },
   "repository": {
