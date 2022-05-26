@@ -35,10 +35,11 @@ class HTMLConsole {
         };
         
         this.defaultConsole = {
-            log: console.log.bind(console),
             error: console.error.bind(console),
-            warn: console.warn.bind(console),
-            table: console.table ? console.table.bind(console) : null
+            info: console.info.bind(console),
+            log: console.log.bind(console),
+            table: console.table ? console.table.bind(console) : null,
+            warn: console.warn.bind(console)
         };
    
         this.active = false;
@@ -82,10 +83,11 @@ class HTMLConsole {
         if (this.active) {
             return;
         }
+        console.error = (...args) => this.makeLog("error", args);
+        console.info = (...args) => this.makeLog("info", args);
         console.log = (...args) => this.makeLog("log", args);
-        console.error = (...args) => this.makeLog("error", args);    
-        console.warn = (...args) => this.makeLog("warn", args);
         console.table = (...args) => this.makeTableLog(args);
+        console.warn = (...args) => this.makeLog("warn", args);
         if (this.options.catchErrors) window.addEventListener("error", this.catchErrorFN, false);
         this.active = true;
     }
@@ -94,10 +96,11 @@ class HTMLConsole {
         if (!this.active) {
             return;
         }
-        console.log = this.defaultConsole.log;
         console.error = this.defaultConsole.error;
-        console.warn = this.defaultConsole.warn;
+        console.info = this.defaultConsole.info;
+        console.log = this.defaultConsole.log;
         console.table = this.defaultConsole.table;
+        console.warn = this.defaultConsole.warn;
         window.removeEventListener("error", this.catchErrorFN, false);
         this.active = false;
     }
@@ -137,6 +140,7 @@ class HTMLConsole {
     makeLog(type, args, preventDefaultLog=this.options.preventDefault) {
         const infoAdder = {
             error: "⛔",
+            info: "ⓘ",
             warn: "⚠️"
         };
 

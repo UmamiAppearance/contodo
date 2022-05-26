@@ -23,27 +23,27 @@ const defaultCSS = `
     border-width: 1pt 0;
 }
 .html-console.default > .warn {
-    background-color: rgb(248, 255, 147);
+    background-color: rgb(250, 250, 180);
 }
-.html-console.default > .warn > span {
-    color: rgb(80, 80, 0) !important;
+.html-console.default > .warn > span.string {
+    color: rgb(80, 80, 0);
 }
 .html-console.default > .error {
-    background-color: rgb(236, 143, 143);
+    background-color: rgb(240, 200, 200);
 }
-.html-console.default > .error > span {
-    color: rgb(100, 0, 0) !important;
+.html-console.default > .error > span.string {
+    color: rgb(100, 0, 0);
 }
-.html-console.default > .log > .null {
+.html-console.default .null {
     color: rgb(127, 127, 127);
 }
-.html-console.default > .log > .number, .html-console.default > .log > .bigint, .html-console.default > .log > .object, .html-console.default > .log > .boolean {
+.html-console.default .number, .html-console.default .bigint, .html-console.default .object, .html-console.default .boolean {
     color: rgb(50, 150, 60);
 }
-.html-console.default > .log > .array-string, .html-console.default > .log > .fn-args, .html-console.default > .log > .symbol {
+.html-console.default .array-string, .html-console.default .fn-args, .html-console.default .symbol {
     color: rgb(255, 0, 255);
 }
-.html-console.default > .log > .function, .html-console.default > .log > .object {
+.html-console.default .function, .html-console.default .object {
     color: rgb(40, 100, 250);
 }
 .html-console.default table {
