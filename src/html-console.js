@@ -31,12 +31,14 @@ class HTMLConsole {
             preventDefault: hasOption("preventDefault") ? Boolean(options.preventDefault) : false,
             reversed: hasOption("reversed") ? Boolean(options.reversed) : false,
             style: hasOption("style") ? options.style : "default",
+            showDebugging: hasOption("showDebugging") ? options.showDebugging : true, 
             width: hasOption("width") ? options.width : "inherit"
         };
         
         this.defaultConsole = {
             assert: console.assert.bind(console),
             clear: console.clear.bind(console),
+            debug: console.debug.bind(console),
             error: console.error.bind(console),
             info: console.info.bind(console),
             log: console.log.bind(console),
@@ -85,8 +87,9 @@ class HTMLConsole {
         if (this.active) {
             return;
         }
-        console.assert = (bool, ...args) => this.makeAssert(bool, args);
-        console.clear = () => this.clearConsole();
+        console.assert = (bool, ...args) => this.assert(bool, args);
+        console.clear = () => this.clear();
+        console.debug = (...args) => this.debug(args);
         console.error = (...args) => this.makeLog("error", args);
         console.info = (...args) => this.makeLog("info", args);
         console.log = (...args) => this.makeLog("log", args);
@@ -101,6 +104,7 @@ class HTMLConsole {
             return;
         }
         console.assert = this.defaultConsole.assert;
+        console.debug = this.defaultConsole.debug;
         console.error = this.defaultConsole.error;
         console.info = this.defaultConsole.info;
         console.log = this.defaultConsole.log;
@@ -160,14 +164,7 @@ class HTMLConsole {
         this.logToHTML(type, ...args);
     }
 
-    makeAssert(bool, args) {
-        if (!this.preventDefault) {
-            this.defaultConsole.assert(bool, ...args);
-        }
-        if (!bool) {
-            this.makeLog("error", ["Assertion failed:", ...args], true);
-        }
-    }
+    
 
     makeTableLog(args, preventDefaultLog=this.options.preventDefault) {
         if (!preventDefaultLog && this.consoleHasTable) {
@@ -498,13 +495,31 @@ class HTMLConsole {
         table.scrollIntoView();
     }
 
-    clearConsole() {
+    assert(bool, args) {
+        if (!this.preventDefault) {
+            this.defaultConsole.assert(bool, ...args);
+        }
+        if (!bool) {
+            this.makeLog("error", ["Assertion failed:", ...args], true);
+        }
+    }
+
+    clear() {
         if (!this.preventDefault) {
             this.defaultConsole.clear();
         }
         this.mainElem.innerHTML = "";
         this.logCount = 0;
         this.makeLog("log", ["Console was cleared"], true);
+    }
+
+    debug(args) {
+        if (!this.preventDefault) {
+            this.defaultConsole.debug(...args);
+        }
+        if (this.options.showDebugging) {
+            this.makeLog("log", args, true);
+        }
     }
 }
 
