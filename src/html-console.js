@@ -35,7 +35,8 @@ class HTMLConsole {
         };
         
         this.defaultConsole = {
-            assert: console.assert.bind(console), 
+            assert: console.assert.bind(console),
+            clear: console.clear.bind(console),
             error: console.error.bind(console),
             info: console.info.bind(console),
             log: console.log.bind(console),
@@ -85,6 +86,7 @@ class HTMLConsole {
             return;
         }
         console.assert = (bool, ...args) => this.makeAssert(bool, args);
+        console.clear = () => this.clearConsole();
         console.error = (...args) => this.makeLog("error", args);
         console.info = (...args) => this.makeLog("info", args);
         console.log = (...args) => this.makeLog("log", args);
@@ -494,6 +496,15 @@ class HTMLConsole {
         divLog.append(table);
 
         table.scrollIntoView();
+    }
+
+    clearConsole() {
+        if (!this.preventDefault) {
+            this.defaultConsole.clear();
+        }
+        this.mainElem.innerHTML = "";
+        this.logCount = 0;
+        this.makeLog("log", ["Console was cleared"], true);
     }
 }
 
