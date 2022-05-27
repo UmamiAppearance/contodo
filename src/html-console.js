@@ -37,6 +37,7 @@ class HTMLConsole {
         
         this.defaultConsole = {
             assert: console.assert.bind(console),
+            count: console.count.bind(console),
             clear: console.clear.bind(console),
             debug: console.debug.bind(console),
             error: console.error.bind(console),
@@ -47,6 +48,7 @@ class HTMLConsole {
         };
    
         this.active = false;
+        this.counters = new Object();
         this.consoleHasTable = (typeof this.defaultConsole.table === "function");
         this.mainElem = null;
         this.style = null;
@@ -88,6 +90,7 @@ class HTMLConsole {
             return;
         }
         console.assert = (bool, ...args) => this.assert(bool, args);
+        console.count = (label) => this.count(label);
         console.clear = () => this.clear();
         console.debug = (...args) => this.debug(args);
         console.error = (...args) => this.makeLog("error", args);
@@ -104,13 +107,15 @@ class HTMLConsole {
             return;
         }
         console.assert = this.defaultConsole.assert;
+        console.count = this.defaultConsole.count;
+        console.clear = this.defaultConsole.clear;
         console.debug = this.defaultConsole.debug;
         console.error = this.defaultConsole.error;
         console.info = this.defaultConsole.info;
         console.log = this.defaultConsole.log;
         console.table = this.defaultConsole.table;
         console.warn = this.defaultConsole.warn;
-        window.removeEventListener("error", this.catchErrorFN, false);
+        if (this.options.catchErrors) window.removeEventListener("error", this.catchErrorFN, false);
         this.active = false;
     }
 
@@ -502,6 +507,25 @@ class HTMLConsole {
         if (!bool) {
             this.makeLog("error", ["Assertion failed:", ...args], true);
         }
+    }
+
+    count(label) {
+        if (!this.preventDefault) {
+            this.defaultConsole.count(label);
+        }
+
+        if (typeof label === "undefined") {
+            label = "default";
+        } else {
+            label = String(label);
+        }
+
+        if (!this.counters[label]) {
+            this.counters[label] = 1;
+        } else {
+            this.counters[label] ++;
+        }
+        this.makeLog("log", [`${label}: ${this.counters[label]}`], true);
     }
 
     clear() {
