@@ -44,6 +44,9 @@ class HTMLConsole {
             info: console.info.bind(console),
             log: console.log.bind(console),
             table: console.table ? console.table.bind(console) : null,
+            time: console.time.bind(console),
+            timeEnd: console.timeEnd.bind(console),
+            timeLog: console.timeLog.bind(console),
             warn: console.warn.bind(console)
         };
    
@@ -52,6 +55,7 @@ class HTMLConsole {
         this.consoleHasTable = (typeof this.defaultConsole.table === "function");
         this.mainElem = null;
         this.style = null;
+        this.timers = new Object;
 
         this.catchErrorFN = this.catchErrorFN.bind(this);
 
@@ -97,6 +101,9 @@ class HTMLConsole {
         console.info = (...args) => this.makeLog("info", args);
         console.log = (...args) => this.makeLog("log", args);
         console.table = (...args) => this.makeTableLog(args);
+        console.time = (label) => this.time(label);
+        console.timeEnd = (label) => this.timeEnd(label);
+        console.timeLog = (label) => this.timeLog(label);
         console.warn = (...args) => this.makeLog("warn", args);
         if (this.options.catchErrors) window.addEventListener("error", this.catchErrorFN, false);
         this.active = true;
@@ -114,6 +121,9 @@ class HTMLConsole {
         console.info = this.defaultConsole.info;
         console.log = this.defaultConsole.log;
         console.table = this.defaultConsole.table;
+        console.time = this.defaultConsole.time;
+        console.timeEnd = this.defaultConsole.timeEnd;
+        console.timeLog = this.defaultConsole.timeLog;
         console.warn = this.defaultConsole.warn;
         if (this.options.catchErrors) window.removeEventListener("error", this.catchErrorFN, false);
         this.active = false;
@@ -500,6 +510,15 @@ class HTMLConsole {
         table.scrollIntoView();
     }
 
+    #makeLabelStr(label) {
+        if (typeof label === "undefined") {
+            label = "default";
+        } else {
+            label = String(label);
+        }
+        return label;
+    }
+
     assert(bool, args) {
         if (!this.preventDefault) {
             this.defaultConsole.assert(bool, ...args);
@@ -514,11 +533,7 @@ class HTMLConsole {
             this.defaultConsole.count(label);
         }
 
-        if (typeof label === "undefined") {
-            label = "default";
-        } else {
-            label = String(label);
-        }
+        label = this.#makeLabelStr(label);
 
         if (!this.counters[label]) {
             this.counters[label] = 1;
@@ -544,6 +559,46 @@ class HTMLConsole {
         if (this.options.showDebugging) {
             this.makeLog("log", args, true);
         }
+    }
+
+    time(label) {
+        label = this.#makeLabelStr(label);
+
+        if (!this.timers[label]) {
+            this.timers[label] = window.performance.now();
+        } else {
+            const msg = `Timer '${label}' already exists`;
+            this.defaultConsole.warn(msg);
+            this.makeLog("warn", [msg], true);
+        }
+    }
+
+    #timeLogEnd(label) {
+        label = this.#makeLabelStr(label);
+
+        let msg;
+        let type;
+        if (this.timers[label]) {
+            const elapsed = window.performance.now() - this.timers[label];
+            msg = `${label}: ${elapsed} ms`;
+            type = "log";
+        } else {
+            msg = `Timer '${label}' does not exist`;
+            type = "warn";
+        }
+        this.defaultConsole[type](msg);
+        this.makeLog(type, [msg], true);
+        
+        return label;
+    }
+
+    timeEnd(label) {
+        label = this.#timeLogEnd(label);
+        delete this.timers[label];
+    }
+
+    timeLog(label) {
+        this.#timeLogEnd(label);
     }
 }
 
