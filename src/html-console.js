@@ -35,6 +35,7 @@ class HTMLConsole {
         };
         
         this.defaultConsole = {
+            assert: console.assert.bind(console), 
             error: console.error.bind(console),
             info: console.info.bind(console),
             log: console.log.bind(console),
@@ -83,6 +84,7 @@ class HTMLConsole {
         if (this.active) {
             return;
         }
+        console.assert = (bool, ...args) => this.makeAssert(bool, args);
         console.error = (...args) => this.makeLog("error", args);
         console.info = (...args) => this.makeLog("info", args);
         console.log = (...args) => this.makeLog("log", args);
@@ -96,6 +98,7 @@ class HTMLConsole {
         if (!this.active) {
             return;
         }
+        console.assert = this.defaultConsole.assert;
         console.error = this.defaultConsole.error;
         console.info = this.defaultConsole.info;
         console.log = this.defaultConsole.log;
@@ -153,6 +156,15 @@ class HTMLConsole {
         }
 
         this.logToHTML(type, ...args);
+    }
+
+    makeAssert(bool, args) {
+        if (!this.preventDefault) {
+            this.defaultConsole.assert(bool, ...args);
+        }
+        if (!bool) {
+            this.makeLog("error", ["Assertion failed:", ...args], true);
+        }
     }
 
     makeTableLog(args, preventDefaultLog=this.options.preventDefault) {
