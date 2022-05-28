@@ -40,10 +40,10 @@ const defaultCSS = `
 .html-console.default .number, .html-console.default .bigint, .html-console.default .object, .html-console.default .boolean {
     color: rgb(50, 150, 60);
 }
-.html-console.default .array-string, .html-console.default .fn-args, .html-console.default .symbol {
+.html-console.default .array-string, .html-console.default .fn-args, .html-console.default .symbol, .html-console.default .trace-head {
     color: rgb(255, 0, 255);
 }
-.html-console.default .function, .html-console.default .object {
+.html-console.default .function, .html-console.default .object, .html-console.default .trace-file {
     color: rgb(40, 100, 250);
 }
 .html-console.default table {

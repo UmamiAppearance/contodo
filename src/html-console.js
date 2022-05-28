@@ -572,17 +572,22 @@ class HTMLConsole {
             this.timers[label] = now;
         } else {
             const msg = `Timer '${label}' already exists`;
-            this.defaultConsole.warn(msg);
             this.makeLog("warn", [msg], true);
+
+            if (!this.preventDefault) {
+                this.defaultConsole.warn(msg);
+            }
         }
     }
 
     #timeLogEnd(label) {
-        const elapsed = window.performance.now() - this.timers[label];
+        const now = window.performance.now();
         label = this.#makeLabelStr(label);
+        const elapsed = now - this.timers[label];
 
         let msg;
         let type;
+
         if (this.timers[label]) {
             msg = `${label}: ${elapsed} ms`;
             type = "log";
@@ -590,8 +595,11 @@ class HTMLConsole {
             msg = `Timer '${label}' does not exist`;
             type = "warn";
         }
-        this.defaultConsole[type](msg);
+
         this.makeLog(type, [msg], true);
+        if (!this.preventDefault) {
+            this.defaultConsole[type](msg);
+        }
         
         return label;
     }
@@ -608,17 +616,22 @@ class HTMLConsole {
     trace(args) {
         let stack;
         try {
-            throw new Error("Trace");
+            throw new Error();
         } catch (err) {
             stack = err.stack;
         }
+
         const stackArr = [];
         let addLine = false;
         let lenLeft = 0;
+        
         stack.split("\n").slice(0, -1).forEach(line => {
+
             if (!addLine && line.match("console.trace")) {
                 addLine = true;
-            } else if (addLine) {
+            }
+            
+            else if (addLine) {
                 let name, file;
                 [name, file] = line.split("@");
                 if (!name) {
@@ -632,8 +645,9 @@ class HTMLConsole {
 
         lenLeft++;
 
+        // html trace
         const newLog = this.makeDivLogEntry();
-        newLog.append(this.makeEntrySpan("array-string", "console.trace()"));
+        newLog.append(this.makeEntrySpan("trace-head", "console.trace()"));
 
         for (const arg of args) {
             newLog.append(this.makeEntrySpan("space", " "));
@@ -643,16 +657,25 @@ class HTMLConsole {
         newLog.append("\n");
 
         for (const line of stackArr) {
-            newLog.append(this.makeEntrySpan("string", `  ${line.name}`));
+            newLog.append(this.makeEntrySpan("space", "  "));
+            newLog.append(this.makeEntrySpan("trace-name", line.name));
             newLog.append(this.makeEntrySpan("space", " ".repeat(lenLeft-line.len)));
-            newLog.append(this.makeEntrySpan("object", line.file));
+            newLog.append(this.makeEntrySpan("trace-file", line.file));
             newLog.append("\n");
         }
 
         newLog.scrollIntoView();
         
-        //this.makeLog("log", [stackArr], true);
-        //console.log(stackArr.join("\n")); this.defaultConsole.log("\n\n"); eval("this.defaultConsole.trace()");
+        // default console trace
+        if (!this.preventDefault) {
+            const msg = ["%cconsole.trace()", "color:magenta;", ...args, "\n"];
+            
+            for (const line of stackArr) {
+                msg.push(`  ${line.name}${" ".repeat(lenLeft-line.len)}${line.file}\n`);
+            }
+
+            this.defaultConsole.log(...msg);
+        }
     }
 }
 
