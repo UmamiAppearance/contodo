@@ -38,6 +38,7 @@ class HTMLConsole {
         this.defaultConsole = {
             assert: console.assert.bind(console),
             count: console.count.bind(console),
+            countReset: console.countReset.bind(console),
             clear: console.clear.bind(console),
             debug: console.debug.bind(console),
             error: console.error.bind(console),
@@ -96,6 +97,7 @@ class HTMLConsole {
         }
         console.assert = (bool, ...args) => this.assert(bool, args);
         console.count = (label) => this.count(label);
+        console.countReset = (label) => this.countReset(label);
         console.clear = () => this.clear();
         console.debug = (...args) => this.debug(args);
         console.error = (...args) => this.makeLog("error", args);
@@ -117,6 +119,7 @@ class HTMLConsole {
         }
         console.assert = this.defaultConsole.assert;
         console.count = this.defaultConsole.count;
+        console.countReset = this.defaultConsole.countReset;
         console.clear = this.defaultConsole.clear;
         console.debug = this.defaultConsole.debug;
         console.error = this.defaultConsole.error;
@@ -532,10 +535,6 @@ class HTMLConsole {
     }
 
     count(label) {
-        if (!this.preventDefault) {
-            this.defaultConsole.count(label);
-        }
-
         label = this.#makeLabelStr(label);
 
         if (!this.counters[label]) {
@@ -543,7 +542,20 @@ class HTMLConsole {
         } else {
             this.counters[label] ++;
         }
-        this.makeLog("log", [`${label}: ${this.counters[label]}`], true);
+        this.makeLog("log", [`${label}: ${this.counters[label]}`]);
+    }
+
+    countReset(label) {
+        label = this.#makeLabelStr(label);
+        
+        if (Object.prototype.hasOwnProperty.call(this.counters, label)) {
+            this.counters[label] = 0;
+            this.makeLog("log", [`${label}: ${this.counters[label]}`]);
+        } else {
+            const msg = `Count for '${label}' does not exist`;
+            this.makeLog("warn", [msg]);
+        }
+        
     }
 
     clear() {
