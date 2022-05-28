@@ -47,6 +47,7 @@ class HTMLConsole {
             time: console.time.bind(console),
             timeEnd: console.timeEnd.bind(console),
             timeLog: console.timeLog.bind(console),
+            trace: console.trace.bind(console),
             warn: console.warn.bind(console)
         };
    
@@ -104,6 +105,7 @@ class HTMLConsole {
         console.time = (label) => this.time(label);
         console.timeEnd = (label) => this.timeEnd(label);
         console.timeLog = (label) => this.timeLog(label);
+        console.trace = (...args) => this.trace(args);
         console.warn = (...args) => this.makeLog("warn", args);
         if (this.options.catchErrors) window.addEventListener("error", this.catchErrorFN, false);
         this.active = true;
@@ -124,6 +126,7 @@ class HTMLConsole {
         console.time = this.defaultConsole.time;
         console.timeEnd = this.defaultConsole.timeEnd;
         console.timeLog = this.defaultConsole.timeLog;
+        console.trace = this.defaultConsole.trace;
         console.warn = this.defaultConsole.warn;
         if (this.options.catchErrors) window.removeEventListener("error", this.catchErrorFN, false);
         this.active = false;
@@ -562,10 +565,11 @@ class HTMLConsole {
     }
 
     time(label) {
+        const now = window.performance.now();
         label = this.#makeLabelStr(label);
 
         if (!this.timers[label]) {
-            this.timers[label] = window.performance.now();
+            this.timers[label] = now;
         } else {
             const msg = `Timer '${label}' already exists`;
             this.defaultConsole.warn(msg);
@@ -574,12 +578,12 @@ class HTMLConsole {
     }
 
     #timeLogEnd(label) {
+        const elapsed = window.performance.now() - this.timers[label];
         label = this.#makeLabelStr(label);
 
         let msg;
         let type;
         if (this.timers[label]) {
-            const elapsed = window.performance.now() - this.timers[label];
             msg = `${label}: ${elapsed} ms`;
             type = "log";
         } else {
@@ -599,6 +603,56 @@ class HTMLConsole {
 
     timeLog(label) {
         this.#timeLogEnd(label);
+    }
+
+    trace(args) {
+        let stack;
+        try {
+            throw new Error("Trace");
+        } catch (err) {
+            stack = err.stack;
+        }
+        const stackArr = [];
+        let addLine = false;
+        let lenLeft = 0;
+        stack.split("\n").slice(0, -1).forEach(line => {
+            if (!addLine && line.match("console.trace")) {
+                addLine = true;
+            } else if (addLine) {
+                let name, file;
+                [name, file] = line.split("@");
+                if (!name) {
+                    name = "(anonymous)";
+                }
+                const len = name.length;
+                lenLeft = Math.max(lenLeft, len);
+                stackArr.push({name, file, len});
+            }
+        });
+
+        lenLeft++;
+
+        const newLog = this.makeDivLogEntry();
+        newLog.append(this.makeEntrySpan("array-string", "console.trace()"));
+
+        for (const arg of args) {
+            newLog.append(this.makeEntrySpan("space", " "));
+            this.analyzeInputMakeSpan(arg, typeof arg, newLog);
+        }
+
+        newLog.append("\n");
+
+        for (const line of stackArr) {
+            newLog.append(this.makeEntrySpan("string", `  ${line.name}`));
+            newLog.append(this.makeEntrySpan("space", " ".repeat(lenLeft-line.len)));
+            newLog.append(this.makeEntrySpan("object", line.file));
+            newLog.append("\n");
+        }
+
+        newLog.scrollIntoView();
+        
+        //this.makeLog("log", [stackArr], true);
+        //console.log(stackArr.join("\n")); this.defaultConsole.log("\n\n"); eval("this.defaultConsole.trace()");
     }
 }
 
