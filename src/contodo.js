@@ -10,7 +10,7 @@ import { isIdentifier, isPositiveInteger } from "./utils.js";
 import defaultCSS from "./default-css.js";
 
 /**
- * Mirror console logs into a code tag.
+ * 
  *
  * Inspired by https://github.com/bahmutov/console-log-div
  */
@@ -27,7 +27,6 @@ class ConTodo {
             catchErrors: hasOption("catchErrors") ? Boolean(options.catchErrors) : false,
             height: hasOption("height") ? options.height : "inherit",
             maxEntries: hasOption("maxEntries") ? Math.max(parseInt(Number(options.maxEntries), 10), 0) : 0,
-            name: hasOption("name") ? options.name : "html-console",
             preventDefault: hasOption("preventDefault") ? Boolean(options.preventDefault) : false,
             reversed: hasOption("reversed") ? Boolean(options.reversed) : false,
             style: hasOption("style") ? options.style : "default",
@@ -71,7 +70,7 @@ class ConTodo {
         if (!this.mainElem) {
             this.mainElem = document.createElement("code");
             this.parentNode.append(this.mainElem);
-            this.mainElem.classList.add("html-console", this.options.name, this.options.style);
+            this.mainElem.classList.add("contodo", this.options.style);
             this.mainElem.style.height = this.options.height;
             this.logCount = 0;
         }
