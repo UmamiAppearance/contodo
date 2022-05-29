@@ -1,4 +1,4 @@
-/*
+/**
  * [contodo]{@link https://github.com/UmamiAppearance/contodo}
  *
  * @version 0.1.0
@@ -14,7 +14,7 @@ import defaultCSS from "./default-css.js";
  *
  * Inspired by https://github.com/bahmutov/console-log-div
  */
-class HTMLConsole {
+class ConTodo {
     constructor(node, options={}) {
         
         this.parentNode = (node) ? node : document.body;
@@ -691,4 +691,4 @@ class HTMLConsole {
     }
 }
 
-export { HTMLConsole };
+export default ConTodo;

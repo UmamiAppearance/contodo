@@ -10,6 +10,7 @@
     "test": "./test"
   },
   "scripts": {
+    "build": "rollup -c",
     "lint": "eslint ./src/",
     "test": "node ./test/test.js"
   },
@@ -29,6 +30,8 @@
   "homepage": "https://github.com/UmamiAppearance/contodo#readme",
   "devDependencies": {
     "eslint": "^8.15.0",
-    "no-bro-cote": "^0.1.1"
+    "no-bro-cote": "^0.1.1",
+    "rollup": "^2.75.1",
+    "rollup-plugin-terser": "^7.0.2"
   }
 }
