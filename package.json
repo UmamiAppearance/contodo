@@ -1,8 +1,8 @@
 {
-  "name": "html-console",
+  "name": "contodo",
   "version": "0.1.0",
-  "description": "Render console output to HTML",
-  "browser": "scr/html-console.js",
+  "description": "HTML Console. Let's you output your browser console to a document node.",
+  "browser": "scr/contodo.js",
   "type": "module",
   "directories": {
     "example": "./examples",
@@ -15,7 +15,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/UmamiAppearance/HTMLConsole.git"
+    "url": "git+https://github.com/UmamiAppearance/contodo.git"
   },
   "keywords": [
     "console",
@@ -24,9 +24,9 @@
   "author": "UmamiAppearance",
   "license": "GPL-3.0-or-later",
   "bugs": {
-    "url": "https://github.com/UmamiAppearance/HTMLConsole/issues"
+    "url": "https://github.com/UmamiAppearance/contodo/issues"
   },
-  "homepage": "https://github.com/UmamiAppearance/HTMLConsole#readme",
+  "homepage": "https://github.com/UmamiAppearance/contodo#readme",
   "devDependencies": {
     "eslint": "^8.15.0",
     "no-bro-cote": "^0.1.1"
