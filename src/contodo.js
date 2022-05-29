@@ -10,17 +10,36 @@ import { isIdentifier, isPositiveInteger } from "./utils.js";
 import defaultCSS from "./default-css.js";
 
 /**
- * 
+ * Creates a html node which displays browser console
+ * entries. It is possible to mirror the console or 
+ * to stop the default console from logging.
+ * The methods "console.dir/dirxml" and console.group*
+ * are not available. Every other method can be rendered
+ * into a document node.
  *
  * Inspired by https://github.com/bahmutov/console-log-div
  */
 class ConTodo {
+
+    /**
+     * The constructor sets all options, stores the
+     * default console and initializes the document
+     * node to a provided patent node. If it is not
+     * provided contodo is appended to the body.
+     *  
+     * @param {object} [node=document.body] - Parent document node. 
+     * @param {object} [options] - Options object.
+     */
     constructor(node, options={}) {
         
+        // Parent Node
         this.parentNode = (node) ? node : document.body;
 
+        // Helper function to test, wether an option
+        // was set.
         const hasOption = (key) => Object.prototype.hasOwnProperty.call(options, key);
 
+        // Options / Default Options
         this.options = {
             applyCSS: hasOption("applyCSS") ? Boolean(options.applyCSS) : true,
             autostart: hasOption("autostart") ? Boolean(options.autostart) : true,
@@ -34,6 +53,7 @@ class ConTodo {
             width: hasOption("width") ? options.width : "inherit"
         };
         
+        // Store Default Console
         this.defaultConsole = {
             assert: console.assert.bind(console),
             count: console.count.bind(console),
@@ -51,6 +71,7 @@ class ConTodo {
             warn: console.warn.bind(console)
         };
    
+        // Class values
         this.active = false;
         this.counters = new Object();
         this.consoleHasTable = (typeof this.defaultConsole.table === "function");
@@ -58,14 +79,19 @@ class ConTodo {
         this.style = null;
         this.timers = new Object;
 
+        // Bind Error Function to Class
         this.catchErrorFN = this.catchErrorFN.bind(this);
 
+        // Auto Init
         if (this.options.autostart) {
             this.createDocumentNode();
             this.initFunctions();
         }
     }
 
+    /**
+     * Creates the actual node in the document.
+     */
     createDocumentNode() {
         if (!this.mainElem) {
             this.mainElem = document.createElement("code");
@@ -79,6 +105,9 @@ class ConTodo {
         }
     }
 
+    /**
+     * Removes contodo node from document
+     */
     destroyDocumentNode() {
         if (this.active) {
             this.restoreDefaultConsole();
@@ -90,6 +119,10 @@ class ConTodo {
         this.mainElem = null;
     }
 
+    /**
+     * Replaces default console methods with
+     * contodo methods.
+     */
     initFunctions() {
         if (this.active) {
             return;
@@ -112,6 +145,9 @@ class ConTodo {
         this.active = true;
     }
 
+    /**
+     * Restores the console methods.
+     */
     restoreDefaultConsole() {
         if (!this.active) {
             return;
@@ -134,6 +170,10 @@ class ConTodo {
         this.active = false;
     }
 
+    /**
+     * Allows the displaying of errors inside of contodo.
+     * @param {*} err 
+     */
     catchErrorFN(err) {
         this.makeLog(
             "error", 
@@ -149,6 +189,9 @@ class ConTodo {
         );
     }
 
+    /**
+     * Applies CSS to document.
+     */
     applyCSS() {
         if (this.style) {
             return;
@@ -158,6 +201,9 @@ class ConTodo {
         document.head.append(this.style);
     }
 
+    /**
+     * Removes CSS from document.
+     */
     removeCSS() {
         if (!this.style) {
             return;
@@ -166,6 +212,12 @@ class ConTodo {
         this.style = null;
     }
 
+    /**
+     * Generic method to console[error|info|log|warn]
+     * @param {string} type - error|info|log|warn
+     * @param {Array} args - Message arguments.
+     * @param {boolean} preventDefaultLog - If true it does not log to the default console.
+     */
     makeLog(type, args, preventDefaultLog=this.options.preventDefault) {
         const infoAdder = {
             error: "⛔",
@@ -184,8 +236,12 @@ class ConTodo {
         this.logToHTML(type, ...args);
     }
 
-    
-
+    /**
+     * Creates a HTML table and unpacks the content
+     * into it. 
+     * @param {*} args - Shall be an iterable or object. 
+     * @param {*} preventDefaultLog - If true it does not log to the default console.
+     */
     makeTableLog(args, preventDefaultLog=this.options.preventDefault) {
         if (!preventDefaultLog && this.consoleHasTable) {
             this.defaultConsole.table(...args);
@@ -249,6 +305,12 @@ class ConTodo {
         }
     }
 
+    /**
+     * Creates a new log node and appends it to the
+     * contodo main element. 
+     * @param {string} [className="log"] - Class name of the log (determines the styling) 
+     * @returns {object} - Log Node.
+     */
     makeDivLogEntry(className="log") {        
         let log = document.createElement("div");
         log.classList.add("log", className);
@@ -275,6 +337,13 @@ class ConTodo {
         return log;
     }
 
+    /**
+     * Helps to create a classed span inside of the
+     * current log (css styled).
+     * @param {string} CSSClass - CSS Class of the span elem. 
+     * @param {object} content - Span DOM Node.
+     * @returns 
+     */
     makeEntrySpan(CSSClass, content) {
         const span = document.createElement("span");
         span.classList.add(CSSClass);
