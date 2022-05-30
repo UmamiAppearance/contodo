@@ -39,7 +39,7 @@ class ConTodo {
         // was set.
         const hasOption = (key) => Object.prototype.hasOwnProperty.call(options, key);
 
-        // Options / Default Options
+        // (Default) Options
         this.options = {
             applyCSS: hasOption("applyCSS") ? Boolean(options.applyCSS) : true,
             autostart: hasOption("autostart") ? Boolean(options.autostart) : true,
@@ -54,7 +54,7 @@ class ConTodo {
             width: hasOption("width") ? options.width : "inherit"
         };
         
-        // Store Default Console
+        // Store Default Console Methods
         this.defaultConsole = {
             assert: console.assert.bind(console),
             count: console.count.bind(console),
@@ -90,6 +90,7 @@ class ConTodo {
         }
     }
 
+
     /**
      * Creates the actual node in the document.
      */
@@ -106,6 +107,7 @@ class ConTodo {
         }
     }
 
+
     /**
      * Removes contodo node from document
      */
@@ -119,6 +121,7 @@ class ConTodo {
         this.mainElem.remove();
         this.mainElem = null;
     }
+
 
     /**
      * Replaces default console methods with
@@ -149,6 +152,7 @@ class ConTodo {
         this.active = true;
     }
 
+
     /**
      * Restores the console methods.
      */
@@ -177,6 +181,7 @@ class ConTodo {
         this.active = false;
     }
 
+
     /**
      * Allows the displaying of errors inside of contodo.
      * @param {*} err 
@@ -196,6 +201,7 @@ class ConTodo {
         );
     }
 
+
     /**
      * Applies CSS to document.
      */
@@ -208,6 +214,7 @@ class ConTodo {
         document.head.append(this.style);
     }
 
+
     /**
      * Removes CSS from document.
      */
@@ -218,6 +225,7 @@ class ConTodo {
         this.style.remove();
         this.style = null;
     }
+
 
     /**
      * Console[error|info|log|warn] to node. It adds a 
@@ -241,12 +249,12 @@ class ConTodo {
         }
 
         const newLog = this.#makeDivLogEntry(type);
-        const last = args.length-1;
+        const lastIndex = args.length-1;
 
         // An empty log call only logs an empty space.
         // (It has to log something, otherwise the node 
         // would collapse.)
-        if (type === "log" && last < 0) {
+        if (type === "log" && lastIndex < 0) {
             this.#makeSpaceSpan(newLog);
         }
         
@@ -262,7 +270,7 @@ class ConTodo {
         args.forEach((arg, i) => {
             this.#analyzeInputMakeSpan(arg, newLog);
 
-            if (i !== last) {
+            if (i !== lastIndex) {
                 this.#makeSpaceSpan(newLog);
             }
         });
@@ -270,6 +278,7 @@ class ConTodo {
         // Finally scroll to the current log
         newLog.scrollIntoView();
     }
+
 
     /**
      * Prepares the data for a HTML table. The actual
@@ -406,12 +415,24 @@ class ConTodo {
     }
 
     /**
-     * Creates a span with class space which
-     * contains one space by default.
+     * Shortcut. Creates a span with the class "space",
+     * which contains one space by default.
      * @param {object} log - log node
+     * @param {number} [spaces=1] - The amount of spaces.
      */
     #makeSpaceSpan(log, spaces=1) {
         log.append(this.#makeEntrySpan("space", " ".repeat(spaces)));
+    }
+
+    /**
+     * This error is logged, if the type can't be
+     * analyzed. Because of a case, which is not 
+     * thought of...
+     * @param {*} input - Input Arguments. 
+     */
+    #foundEdgeCaseError() {
+        console.error("You found an edge case, which is not covered yet.\nPlease create an issue mentioning your input at:\nhttps://github.com/UmamiAppearance/contodo/issues");
+        
     }
 
     /**
@@ -426,6 +447,8 @@ class ConTodo {
         let argType = typeof arg;
 
         if (argType === "object") {
+
+            // Array and Typed Array
             if (Array.isArray(arg) || (ArrayBuffer.isView(arg) && (arg.constructor.name.match("Array")))) {
                 const lastIndex = arg.length - 1;
                 newLog.append(this.#makeEntrySpan("object", `${arg.constructor.name} [ `));
@@ -450,6 +473,7 @@ class ConTodo {
                 newLog.append(this.#makeEntrySpan("object", " ]"));
             }
 
+            // DataView
             else if (ArrayBuffer.isView(arg)) {
                 newLog.append(this.#makeEntrySpan("object", "DataView { buffer: ArrayBuffer, byteLength: "));
                 newLog.append(this.#makeEntrySpan("number", arg.byteLength));
@@ -458,21 +482,28 @@ class ConTodo {
                 newLog.append(this.#makeEntrySpan("object", " }"));
             }
 
+            // null
             else if (arg === null) {
                 newLog.append(this.#makeEntrySpan("null", "null"));
             }
             
+            // ArrayBuffer
             else if (arg.constructor.name === "ArrayBuffer") {
                 newLog.append(this.#makeEntrySpan("object", "ArrayBuffer { byteLength: "));
                 newLog.append(this.#makeEntrySpan("number", arg.byteLength));
                 newLog.append(this.#makeEntrySpan("object", " }"));
             }
 
+            // Ordinary Object with key, value pairs
             else if (arg === Object(arg)) {
                 newLog.append(this.#makeEntrySpan("object", "Object { "));
                 
                 const objEntries = Object.entries(arg);
                 const lastIndex = objEntries.length - 1;
+
+                // Walk through all entries and call 
+                // #analyzeInputMakeSpan recursively
+                // for the values
                 objEntries.forEach((entry, i) => {
                     entry.forEach((subArg, j) => {
                         let subType = typeof subArg;
@@ -507,12 +538,14 @@ class ConTodo {
                 newLog.append(this.#makeEntrySpan("object", " }"));
             }
             
+
+            // Unexpected Object Type
             else {
-                this.defaultConsole.error("You found an edge case, which is not covered yet.\nPlease create an issue mentioning your input at:\nhttps://github.com/UmamiAppearance/HTMLConsole/issues");
-                newLog.append(this.#makeEntrySpan("string", arg));
+                this.#foundEdgeCaseError();
             }
         }
 
+        // Function
         else if (argType === "function") {
             // cf. https://stackoverflow.com/a/31194949
             let fnStr = Function.toString.call(arg);
@@ -520,6 +553,7 @@ class ConTodo {
             let hasConstructor = true;
             let paramArray;
             
+            // Arrow Function
             if (fnStr.match("=>")) {
                 paramArray = fnStr
                     .replace(/\s+/g, "")                        // remove all whitespace
@@ -529,11 +563,13 @@ class ConTodo {
                     .filter(Boolean);                           // filter [""]
             }
             
+            // Class without constructor
             else if (isClass && !fnStr.match("constructor")) {
                 hasConstructor = false;
                 paramArray = [];
             }
             
+            // Class and regular Functions
             else {
                 paramArray = fnStr
                     .replace(/\/\/.*$/mg,"")                    // strip single-line comments
@@ -545,6 +581,7 @@ class ConTodo {
                     .filter(Boolean);                           // filter [""]
             }
  
+            // Join function arguments
             const params = paramArray.join(", ");
             
             if (isClass) {
@@ -562,29 +599,40 @@ class ConTodo {
             }
         }
 
+        // "undefined"
         else if (argType === "undefined") {
             newLog.append(this.#makeEntrySpan("null", "undefined"));
         }
 
-        
+        // String
         else {
+            
             if (argType === "string") {
+                // Empty String
                 if (arg === "") {
                     arg = "<empty string>";
                 }
-                // pass
+                // All other strings just pass
             }
             
+            // BigInt
             else if (argType === "bigint") {
                 arg += "n";
             }
             
+            // Symbol
             else if (argType === "symbol") {
                 arg = arg.toString().replace("(", "(\"").replace(")", "\")");
             }
             
+            // NaN
             else if (isNaN(arg)) {
                 argType = "null";
+            }
+
+            // Unexpected Type
+            else {
+                this.#foundEdgeCaseError(arg);
             }
             newLog.append(this.#makeEntrySpan(argType, arg));
         }
