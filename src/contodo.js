@@ -236,8 +236,6 @@ class ConTodo {
             warn: "⚠️"
         };
 
-        this.defaultConsole.log("ARGS", args);
-
         if (!preventDefaultLog) {
             this.defaultConsole[type](...args);
         }
@@ -640,9 +638,11 @@ class ConTodo {
     }
 
     /**
-     * 
-     * @param {*} label 
-     * @returns 
+     * Converts the input to a label string.
+     * If the input is undefined output will
+     * be "default";
+     * @param {*} [label] 
+     * @returns {string} - label
      */
     #makeLabelStr(label) {
         if (typeof label === "undefined") {
@@ -653,8 +653,13 @@ class ConTodo {
         return label;
     }
 
+    /**
+     * console.assert
+     * @param {boolean} bool - Result of a comparison 
+     * @param {*} [args] - Parameter are appended to the assertion call.
+     */
     assert(bool, args) {
-        if (!this.preventDefault) {
+        if (!this.options.preventDefault) {
             this.defaultConsole.assert(bool, ...args);
         }
         if (!bool) {
@@ -662,6 +667,10 @@ class ConTodo {
         }
     }
 
+    /**
+     * console.count
+     * @param {*} [label] - Input gets converted to string. Label is "default" if nothing is passed. 
+     */
     count(label) {
         label = this.#makeLabelStr(label);
 
@@ -673,6 +682,10 @@ class ConTodo {
         this.makeLog("log", [`${label}: ${this.counters[label]}`]);
     }
 
+    /**
+     * console.countReset
+     * @param {*} label - Corresponding label.
+     */
     countReset(label) {
         label = this.#makeLabelStr(label);
         
@@ -686,14 +699,21 @@ class ConTodo {
         
     }
 
+    /**
+     * Bonus feature. Shows all current counters via
+     * console.table.
+     */
     countersShow() {
         if (Object.keys(this.counters).length) {
             this.makeTableLog([this.counters]);
         }
     }
 
+    /**
+     * console.clear
+     */
     clear() {
-        if (!this.preventDefault) {
+        if (!this.options.preventDefault) {
             this.defaultConsole.clear();
         }
         this.mainElem.innerHTML = "";
@@ -701,8 +721,12 @@ class ConTodo {
         this.makeLog("log", ["Console was cleared"], true);
     }
 
+    /**
+     * console.debug
+     * @param {} args 
+     */
     debug(args) {
-        if (!this.preventDefault) {
+        if (!this.options.preventDefault) {
             this.defaultConsole.debug(...args);
         }
         if (this.options.showDebugging) {
@@ -720,7 +744,7 @@ class ConTodo {
             const msg = `Timer '${label}' already exists`;
             this.makeLog("warn", [msg], true);
 
-            if (!this.preventDefault) {
+            if (!this.options.preventDefault) {
                 this.defaultConsole.warn(msg);
             }
         }
@@ -743,7 +767,7 @@ class ConTodo {
         }
 
         this.makeLog(type, [msg], true);
-        if (!this.preventDefault) {
+        if (!this.options.preventDefault) {
             this.defaultConsole[type](msg);
         }
         
@@ -824,7 +848,7 @@ class ConTodo {
         newLog.scrollIntoView();
         
         // default console trace
-        if (!this.preventDefault) {
+        if (!this.options.preventDefault) {
             const msg = ["%cconsole.trace()", "color:magenta;", ...args, "\n"];
             
             for (const line of stackArr) {
