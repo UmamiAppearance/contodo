@@ -34,6 +34,10 @@ const defaultCSS = `
 .contodo.default > .error > span.string {
     color: rgb(100, 0, 0);
 }
+.contodo.default .time {
+    opacity: 0.5;
+    font-size: 80%;
+}
 .contodo.default .null {
     color: rgb(127, 127, 127);
 }

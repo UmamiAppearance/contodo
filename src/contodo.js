@@ -49,7 +49,8 @@ class ConTodo {
             preventDefault: hasOption("preventDefault") ? Boolean(options.preventDefault) : false,
             reversed: hasOption("reversed") ? Boolean(options.reversed) : false,
             style: hasOption("style") ? options.style : "default",
-            showDebugging: hasOption("showDebugging") ? options.showDebugging : true, 
+            showDebugging: hasOption("showDebugging") ? Boolean(options.showDebugging) : true,
+            showTimestamp: hasOption("showTimestamp") ? Boolean(options.showTimestamp) : false,
             width: hasOption("width") ? options.width : "inherit"
         };
         
@@ -61,9 +62,10 @@ class ConTodo {
             clear: console.clear.bind(console),
             debug: console.debug.bind(console),
             error: console.error.bind(console),
+            exception: console.exception ? console.exception.bind(console) : null,
             info: console.info.bind(console),
             log: console.log.bind(console),
-            table: console.table ? console.table.bind(console) : null,
+            table: console.table.bind(console),
             time: console.time.bind(console),
             timeEnd: console.timeEnd.bind(console),
             timeLog: console.timeLog.bind(console),
@@ -74,7 +76,6 @@ class ConTodo {
         // Class values
         this.active = false;
         this.counters = new Object();
-        this.consoleHasTable = (typeof this.defaultConsole.table === "function");
         this.mainElem = null;
         this.style = null;
         this.timers = new Object;
@@ -130,15 +131,18 @@ class ConTodo {
         console.assert = (bool, ...args) => this.assert(bool, args);
         console.count = (label) => this.count(label);
         console.countReset = (label) => this.countReset(label);
+        console.counters = () => this.countersShow();
         console.clear = () => this.clear();
         console.debug = (...args) => this.debug(args);
         console.error = (...args) => this.makeLog("error", args);
+        console.exception = console.error;
         console.info = (...args) => this.makeLog("info", args);
         console.log = (...args) => this.makeLog("log", args);
         console.table = (...args) => this.makeTableLog(args);
         console.time = (label) => this.time(label);
         console.timeEnd = (label) => this.timeEnd(label);
         console.timeLog = (label) => this.timeLog(label);
+        console.timers = () => this.timersShow();
         console.trace = (...args) => this.trace(args);
         console.warn = (...args) => this.makeLog("warn", args);
         if (this.options.catchErrors) window.addEventListener("error", this.catchErrorFN, false);
@@ -155,15 +159,18 @@ class ConTodo {
         console.assert = this.defaultConsole.assert;
         console.count = this.defaultConsole.count;
         console.countReset = this.defaultConsole.countReset;
+        delete console.counters;
         console.clear = this.defaultConsole.clear;
         console.debug = this.defaultConsole.debug;
         console.error = this.defaultConsole.error;
+        console.exception = this.defaultConsole.exception;
         console.info = this.defaultConsole.info;
         console.log = this.defaultConsole.log;
         console.table = this.defaultConsole.table;
         console.time = this.defaultConsole.time;
         console.timeEnd = this.defaultConsole.timeEnd;
         console.timeLog = this.defaultConsole.timeLog;
+        delete console.timers;
         console.trace = this.defaultConsole.trace;
         console.warn = this.defaultConsole.warn;
         if (this.options.catchErrors) window.removeEventListener("error", this.catchErrorFN, false);
@@ -213,7 +220,11 @@ class ConTodo {
     }
 
     /**
-     * Generic method to console[error|info|log|warn]
+     * Prepares console[error|info|log|warn] by adding
+     * a symbol at the start of the log and also calls
+     * the default console. This method is the entry point 
+     * for the four mentioned methods. The actual log is
+     * getting created by "logToNode".
      * @param {string} type - error|info|log|warn
      * @param {Array} args - Message arguments.
      * @param {boolean} preventDefaultLog - If true it does not log to the default console.
@@ -233,17 +244,17 @@ class ConTodo {
             this.addInfo = type; 
         }
 
-        this.logToHTML(type, ...args);
+        this.logToNode(type, ...args);
     }
 
     /**
      * Creates a HTML table and unpacks the content
      * into it. 
-     * @param {*} args - Shall be an iterable or object. 
+     * @param {*} args - Shall be an iterable (otherwise it is a generic log). 
      * @param {*} preventDefaultLog - If true it does not log to the default console.
      */
     makeTableLog(args, preventDefaultLog=this.options.preventDefault) {
-        if (!preventDefaultLog && this.consoleHasTable) {
+        if (!preventDefaultLog) {
             this.defaultConsole.table(...args);
         }
 
@@ -252,15 +263,27 @@ class ConTodo {
         let data, cols;
         [data, cols] = args;
 
+        // If it is not possible to create a table from the data,
+        // create an ordinary log. (As the default console does)
+
         if (!isIterable(data)) {
-            this.logToHTML("log", data);
+            // to prevent logging a literal "undefined"
+            // test this first
+            if (typeof data === "undefined") {
+                this.logToNode("log");
+            } else {
+                this.logToNode("log", data);
+            }
         } 
         
+        // Deconstruct the data
         else {
+            // Array are converted into objects first
             if (typeof data !== "object") {
                 data = Object.assign({}, data);
             }
 
+            
             if (!cols) {
                 const colSet = new Set();
                 for (let rowKey in data) {
@@ -314,8 +337,14 @@ class ConTodo {
     makeDivLogEntry(className="log") {        
         let log = document.createElement("div");
         log.classList.add("log", className);
-        log.dataset.date = new Date().toISOString();
-        
+
+        const dateStr = new Date().toISOString();
+        if (this.options.showTimestamp) {
+            log.append(this.makeEntrySpan("time", dateStr));
+            log.append("\n");
+        }
+        log.dataset.date = dateStr;
+
         this.logCount++;
         let delNode = false;
         if (this.options.maxEntries && this.logCount > this.options.maxEntries) {
@@ -351,7 +380,17 @@ class ConTodo {
         return span;
     }
 
-    analyzeInputMakeSpan(arg, argType, newLog) {
+    /**
+     * Analyzes the type of a given parameter handed to 
+     * the console. It creates a span element with the 
+     * required properties. (Can be called recursively)
+     * 
+     * @param {*} arg - Any input.
+     * @param {object} newLog - The current log document node.
+     */
+    analyzeInputMakeSpan(arg, newLog) {
+        let argType = typeof arg;
+
         if (argType === "object") {
             if (Array.isArray(arg) || (ArrayBuffer.isView(arg) && (arg.constructor.name.match("Array")))) {
                 const lastIndex = arg.length - 1;
@@ -366,7 +405,7 @@ class ConTodo {
                     }
 
                     else {
-                        this.analyzeInputMakeSpan(subArg, subType, newLog);
+                        this.analyzeInputMakeSpan(subArg, newLog);
                     }
                     
                     if (i < lastIndex) {
@@ -419,7 +458,7 @@ class ConTodo {
                         }
 
                         else {
-                            this.analyzeInputMakeSpan(subArg, subType, newLog);
+                            this.analyzeInputMakeSpan(subArg, newLog);
                         }
 
                         if (!j) {
@@ -517,23 +556,43 @@ class ConTodo {
         }
     }
 
-    logToHTML(type, ...args) {
+    /**
+     * Creates standard logs for:
+     *  - console.error
+     *  - console.info
+     *  - console.log
+     *  - console.table (if no iterable was provided)
+     *  - console.warn
+     * @param {*} type 
+     * @param  {...any} args 
+     */
+    logToNode(type, ...args) {
         const newLog = this.makeDivLogEntry(type);
         const start = (type === "log") ? 0 : 1;
         const last = args.length-1;
+        this.defaultConsole.log("LAST", last);
 
+        // The leading symbol is handled separately here
+        // (Only "console.log" starts ar index 0)
         if (start === 1) {
             newLog.append(this.makeEntrySpan("info", args[0]));
             newLog.append(this.makeEntrySpan("space", " "));
         }
 
+        // An empty log call only logs an empty space.
+        // (It has to log something, otherwise the node 
+        // would collapse)
         if (last < 0) {
             newLog.append(this.makeEntrySpan("space", " "));
-        }  else {
-            for (let i=start; i<=last; i++) {
-                let argType = typeof args[i];
+        }
 
-                this.analyzeInputMakeSpan(args[i], argType, newLog);
+        // For every other call every input is getting 
+        // analyzed by "analyzeInputMakeSpan" which also
+        // appends the content. Every node is followed
+        // by a space (except the very last).
+        else {
+            for (let i=start; i<=last; i++) {
+                this.analyzeInputMakeSpan(args[i], newLog);
 
                 if (i !== last) {
                     newLog.append(this.makeEntrySpan("space", " "));
@@ -541,10 +600,18 @@ class ConTodo {
             }
         }
 
+        // Finally scroll to the current log
         newLog.scrollIntoView();
     }
 
 
+    /**
+     * Creates a HTML table from the given input.
+     * (Which must be an array of object to make
+     * it work).
+     * @param {*} data 
+     * @param {*} header 
+     */
     logHTMLTable(data, header) {
         const table = document.createElement("table");
         
@@ -626,6 +693,12 @@ class ConTodo {
         
     }
 
+    countersShow() {
+        if (Object.keys(this.counters).length) {
+            this.makeTableLog([this.counters]);
+        }
+    }
+
     clear() {
         if (!this.preventDefault) {
             this.defaultConsole.clear();
@@ -693,6 +766,17 @@ class ConTodo {
         this.#timeLogEnd(label);
     }
 
+    timersShow() {
+        const now = window.performance.now();
+        const timers = new Object();
+        for (const timer in this.timers) {
+            timers[timer] = `${now - this.timers[timer]} ms`;
+        }
+        if (Object.keys(timers).length) {
+            this.makeTableLog([timers]);
+        }
+    }
+
     trace(args) {
         let stack;
         try {
@@ -731,7 +815,7 @@ class ConTodo {
 
         for (const arg of args) {
             newLog.append(this.makeEntrySpan("space", " "));
-            this.analyzeInputMakeSpan(arg, typeof arg, newLog);
+            this.analyzeInputMakeSpan(arg, newLog);
         }
 
         newLog.append("\n");
