@@ -23,13 +23,13 @@ const defaultCSS = `
     border-width: 1pt 0;
 }
 .contodo.default > .warn {
-    background-color: rgb(250, 250, 180);
+    background-color: #fafab4;
 }
 .contodo.default > .warn > span.string {
-    color: rgb(80, 80, 0);
+    color: #505000;
 }
 .contodo.default > .error {
-    background-color: rgb(240, 200, 200);
+    background-color: #f0c8c8;
 }
 .contodo.default > .error > span.string {
     color: rgb(100, 0, 0);
@@ -39,16 +39,16 @@ const defaultCSS = `
     font-size: 80%;
 }
 .contodo.default .null {
-    color: rgb(127, 127, 127);
+    color: #808080;
 }
 .contodo.default .number, .contodo.default .bigint, .contodo.default .object, .contodo.default .boolean {
-    color: rgb(50, 150, 60);
+    color: #32963c;
 }
 .contodo.default .array-string, .contodo.default .fn-args, .contodo.default .symbol, .contodo.default .trace-head {
-    color: rgb(255, 0, 255);
+    color: #f0f;
 }
 .contodo.default .function, .contodo.default .object, .contodo.default .trace-file {
-    color: rgb(40, 100, 250);
+    color: #2864fa;
 }
 .contodo.default table {
     width: 100%;
