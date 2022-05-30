@@ -684,7 +684,7 @@ class ConTodo {
 
     /**
      * console.countReset
-     * @param {*} label - Corresponding label.
+     * @param {*} [label] - Corresponding label.
      */
     countReset(label) {
         label = this.#makeLabelStr(label);
@@ -723,6 +723,10 @@ class ConTodo {
 
     /**
      * console.debug
+     * Nowadays console.debug and console.log are identical
+     * in browsers. With contodo it is possible to only show
+     * debug logs if debugging is globally enabled. (Which
+     * is the case by default)
      * @param {} args 
      */
     debug(args) {
@@ -734,6 +738,10 @@ class ConTodo {
         }
     }
 
+    /**
+     * console.time
+     * @param {*} [label] - Input gets converted to string. Label is "default" if nothing is passed. 
+     */
     time(label) {
         const now = window.performance.now();
         label = this.#makeLabelStr(label);
@@ -750,6 +758,15 @@ class ConTodo {
         }
     }
 
+    /**
+     * console.timeLog and console.timeEnd are 
+     * basically the same function. The latter
+     * only differs in terms of deleting the 
+     * timer. Therefore this helper function 
+     * was created. 
+     * @param {*} [label] - Corresponding label. 
+     * @returns {string} - label
+     */
     #timeLogEnd(label) {
         const now = window.performance.now();
         label = this.#makeLabelStr(label);
@@ -774,15 +791,27 @@ class ConTodo {
         return label;
     }
 
+    /**
+     * console.timeEnd
+     * @param {*} [label] - Corresponding label. 
+     */
     timeEnd(label) {
         label = this.#timeLogEnd(label);
         delete this.timers[label];
     }
 
+    /**
+     * console.timeEnd
+     * @param {*} [label] - Corresponding label. 
+     */
     timeLog(label) {
         this.#timeLogEnd(label);
     }
 
+    /**
+     * Bonus feature. Shows all current timers via
+     * console.table.
+     */
     timersShow() {
         const now = window.performance.now();
         const timers = new Object();
@@ -794,6 +823,17 @@ class ConTodo {
         }
     }
 
+    /**
+     * console.trace
+     * This one is a little hacky. It is not
+     * possible to call trace directly, as this
+     * file and the caller are part of the stack.
+     * To reach the aimed goal, a generic Error
+     * is thrown and catched to get a stack, which
+     * then cleaned up.
+     *  
+     * @param {*} args 
+     */
     trace(args) {
         let stack;
         try {
