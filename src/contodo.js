@@ -508,34 +508,48 @@ class ConTodo {
                 objEntries.forEach((entry, i) => {
                     entry.forEach((subArg, j) => {
                         let subType = typeof subArg;
+                        const isKey = !j;
+
                         if (subType === "string") {
-                            if (!j) {
+                            
+                            // key
+                            if (isKey) {
                                 subType = "object";
                                 if (isPositiveInteger(subArg)) {
-                                    subArg = Number(subArg).toString();
+                                    subArg = Number(subArg);
                                 } else if (!isIdentifier(subArg)) {
                                     subArg = `"${subArg}"`;
                                 }
-                            } else {
+                            }
+                            
+                            // value
+                            else {
                                 subArg = `"${subArg}"`;
                                 subType = "array-string";
                             }
                             newLog.append(this.#makeEntrySpan(subType, subArg));
                         }
 
+                        // keys must be strings, this case only applies to values
                         else {
                             this.#analyzeInputMakeSpan(subArg, newLog);
                         }
 
-                        if (!j) {
-                            newLog.append(this.#makeEntrySpan("object", ": "));
+                        // append a colon after each key
+                        if (isKey) {
+                            newLog.append(this.#makeEntrySpan("object", ":"));
+                            this.#makeSpaceSpan(newLog);
                         }
                     });
                     
+                    // add a comma and a space after each key/value pair
                     if (i < lastIndex) {
-                        newLog.append(this.#makeEntrySpan("object", ", "));
+                        newLog.append(this.#makeEntrySpan("object", ","));
+                        this.#makeSpaceSpan(newLog);
                     }
                 });
+
+                // close the object with space and curly brace
                 newLog.append(this.#makeEntrySpan("object", " }"));
             }
             
@@ -605,9 +619,9 @@ class ConTodo {
             newLog.append(this.#makeEntrySpan("null", "undefined"));
         }
 
-        // String
         else {
             
+            // String
             if (argType === "string") {
                 // Empty String
                 if (arg === "") {
@@ -631,6 +645,9 @@ class ConTodo {
                 argType = "null";
             }
 
+            // type "number" and "boolean" are walking untouched
+            // until this point and need no special treatment
+
             newLog.append(this.#makeEntrySpan(argType, arg));
         }
     }
@@ -640,8 +657,8 @@ class ConTodo {
      * Creates a HTML table from the given input.
      * (Which must be an array of object to make
      * it work).
-     * @param {*} data 
-     * @param {*} header 
+     * @param {string[]} data - Table body data.
+     * @param {array} header - Table head data.
      */
     #genHTMLTable(data, header) {
         const table = document.createElement("table");
