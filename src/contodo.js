@@ -220,14 +220,14 @@ class ConTodo {
     }
 
     /**
-     * Prepares console[error|info|log|warn] by adding
-     * a symbol at the start of the log and also calls
-     * the default console. This method is the entry point 
-     * for the four mentioned methods. The actual log is
-     * getting created by "logToNode".
+     * Console[error|info|log|warn] to node. It adds a 
+     * symbol at the start of the log for any other than 
+     * log and calls if not prevented.
+     * It is called by many other methods to generate
+     * output. 
      * @param {string} type - error|info|log|warn
      * @param {Array} args - Message arguments.
-     * @param {boolean} preventDefaultLog - If true it does not log to the default console.
+     * @param {boolean} [preventDefaultLog=this.options.preventDefault] - If true it does not log to the default console.
      */
     makeLog(type, args, preventDefaultLog=this.options.preventDefault) {
         const infoAdder = {
@@ -236,20 +236,48 @@ class ConTodo {
             warn: "⚠️"
         };
 
+        this.defaultConsole.log("ARGS", args);
+
         if (!preventDefaultLog) {
             this.defaultConsole[type](...args);
         }
-        if (type !== "log") {
-            args.unshift(infoAdder[type]);
-            this.addInfo = type; 
+
+        const newLog = this.#makeDivLogEntry(type);
+        const last = args.length-1;
+
+        // An empty log call only logs an empty space.
+        // (It has to log something, otherwise the node 
+        // would collapse.)
+        if (type === "log" && last < 0) {
+            this.#makeSpaceSpan(newLog);
+        }
+        
+        // Every other type than a log gets its leading symbol
+        else if (type !== "log") {
+            newLog.append(this.#makeEntrySpan("info", infoAdder[type]));
+            this.#makeSpaceSpan(newLog);
         }
 
-        this.logToNode(type, ...args);
+        // The input is getting analyzed by "#analyzeInputMakeSpan"
+        // which also appends the content to the new log. Every node
+        // is followed by a space node (except the very last).
+        args.forEach((arg, i) => {
+            this.#analyzeInputMakeSpan(arg, newLog);
+
+            if (i !== last) {
+                this.#makeSpaceSpan(newLog);
+            }
+        });
+
+        // Finally scroll to the current log
+        newLog.scrollIntoView();
     }
 
     /**
-     * Creates a HTML table and unpacks the content
-     * into it. 
+     * Prepares the data for a HTML table. The actual
+     * node generation is handled by "genHTMLTable",
+     * which is called at the end by this prep function.
+     * 
      * @param {*} args - Shall be an iterable (otherwise it is a generic log). 
      * @param {*} preventDefaultLog - If true it does not log to the default console.
      */
@@ -258,6 +286,8 @@ class ConTodo {
             this.defaultConsole.table(...args);
         }
 
+        // Helper function. Test wether the data
+        // can be visualized as a table.
         const isIterable = (val) => (typeof val === "object" || (Symbol.iterator in Object(val) && typeof val !== "string"));
         
         let data, cols;
@@ -265,25 +295,19 @@ class ConTodo {
 
         // If it is not possible to create a table from the data,
         // create an ordinary log. (As the default console does)
-
         if (!isIterable(data)) {
-            // to prevent logging a literal "undefined"
-            // test this first
-            if (typeof data === "undefined") {
-                this.logToNode("log");
-            } else {
-                this.logToNode("log", data);
-            }
+            const msg = (typeof data === "undefined") ? [] : [data];
+            this.makeLog("log", msg, true);
         } 
         
-        // Deconstruct the data
+        // Deconstruct and prepare the data
         else {
             // Array are converted into objects first
             if (typeof data !== "object") {
                 data = Object.assign({}, data);
             }
 
-            
+            // Prepare the columns if not provided
             if (!cols) {
                 const colSet = new Set();
                 for (let rowKey in data) {
@@ -300,6 +324,7 @@ class ConTodo {
                 cols = [...colSet];
             }
 
+            // Prepare the header
             let header;
             if (cols.length === 1 && cols[0] == 0) {
                 header = ["(Index)", "Value"];
@@ -307,6 +332,7 @@ class ConTodo {
                 header = ["(Index)", ...cols];
             }
 
+            // Prepare the data
             const tData = [];
             for (const index in data) {
                 let row = data[index];
@@ -324,7 +350,8 @@ class ConTodo {
                 tData.push(rowArray);
             }
             
-            this.logHTMLTable(tData, header);
+            // Call the html table generation
+            this.#genHTMLTable(tData, header);
         }
     }
 
@@ -334,13 +361,13 @@ class ConTodo {
      * @param {string} [className="log"] - Class name of the log (determines the styling) 
      * @returns {object} - Log Node.
      */
-    makeDivLogEntry(className="log") {        
+    #makeDivLogEntry(className="log") {        
         let log = document.createElement("div");
         log.classList.add("log", className);
 
         const dateStr = new Date().toISOString();
         if (this.options.showTimestamp) {
-            log.append(this.makeEntrySpan("time", dateStr));
+            log.append(this.#makeEntrySpan("time", dateStr));
             log.append("\n");
         }
         log.dataset.date = dateStr;
@@ -371,13 +398,22 @@ class ConTodo {
      * current log (css styled).
      * @param {string} CSSClass - CSS Class of the span elem. 
      * @param {object} content - Span DOM Node.
-     * @returns 
+     * @returns {object} - HTML span node
      */
-    makeEntrySpan(CSSClass, content) {
+    #makeEntrySpan(CSSClass, content) {
         const span = document.createElement("span");
         span.classList.add(CSSClass);
         span.textContent = content;
         return span;
+    }
+
+    /**
+     * Creates a span with class space which
+     * contains one space by default.
+     * @param {object} log - log node
+     */
+    #makeSpaceSpan(log, spaces=1) {
+        log.append(this.#makeEntrySpan("space", " ".repeat(spaces)));
     }
 
     /**
@@ -388,54 +424,54 @@ class ConTodo {
      * @param {*} arg - Any input.
      * @param {object} newLog - The current log document node.
      */
-    analyzeInputMakeSpan(arg, newLog) {
+    #analyzeInputMakeSpan(arg, newLog) {
         let argType = typeof arg;
 
         if (argType === "object") {
             if (Array.isArray(arg) || (ArrayBuffer.isView(arg) && (arg.constructor.name.match("Array")))) {
                 const lastIndex = arg.length - 1;
-                newLog.append(this.makeEntrySpan("object", `${arg.constructor.name} [ `));
+                newLog.append(this.#makeEntrySpan("object", `${arg.constructor.name} [ `));
                 
                 arg.forEach((subArg, i) => {
                     let subType = typeof subArg;
                     if (subType === "string") {
                         subArg = `"${subArg}"`;
                         subType = "array-string";
-                        newLog.append(this.makeEntrySpan(subType, subArg));
+                        newLog.append(this.#makeEntrySpan(subType, subArg));
                     }
 
                     else {
-                        this.analyzeInputMakeSpan(subArg, newLog);
+                        this.#analyzeInputMakeSpan(subArg, newLog);
                     }
                     
                     if (i < lastIndex) {
-                        newLog.append(this.makeEntrySpan("object", ", "));
+                        newLog.append(this.#makeEntrySpan("object", ", "));
                     }
                 });
 
-                newLog.append(this.makeEntrySpan("object", " ]"));
+                newLog.append(this.#makeEntrySpan("object", " ]"));
             }
 
             else if (ArrayBuffer.isView(arg)) {
-                newLog.append(this.makeEntrySpan("object", "DataView { buffer: ArrayBuffer, byteLength: "));
-                newLog.append(this.makeEntrySpan("number", arg.byteLength));
-                newLog.append(this.makeEntrySpan("object", ", byteOffset: "));
-                newLog.append(this.makeEntrySpan("number", arg.byteOffset));
-                newLog.append(this.makeEntrySpan("object", " }"));
+                newLog.append(this.#makeEntrySpan("object", "DataView { buffer: ArrayBuffer, byteLength: "));
+                newLog.append(this.#makeEntrySpan("number", arg.byteLength));
+                newLog.append(this.#makeEntrySpan("object", ", byteOffset: "));
+                newLog.append(this.#makeEntrySpan("number", arg.byteOffset));
+                newLog.append(this.#makeEntrySpan("object", " }"));
             }
 
             else if (arg === null) {
-                newLog.append(this.makeEntrySpan("null", "null"));
+                newLog.append(this.#makeEntrySpan("null", "null"));
             }
             
             else if (arg.constructor.name === "ArrayBuffer") {
-                newLog.append(this.makeEntrySpan("object", "ArrayBuffer { byteLength: "));
-                newLog.append(this.makeEntrySpan("number", arg.byteLength));
-                newLog.append(this.makeEntrySpan("object", " }"));
+                newLog.append(this.#makeEntrySpan("object", "ArrayBuffer { byteLength: "));
+                newLog.append(this.#makeEntrySpan("number", arg.byteLength));
+                newLog.append(this.#makeEntrySpan("object", " }"));
             }
 
             else if (arg === Object(arg)) {
-                newLog.append(this.makeEntrySpan("object", "Object { "));
+                newLog.append(this.#makeEntrySpan("object", "Object { "));
                 
                 const objEntries = Object.entries(arg);
                 const lastIndex = objEntries.length - 1;
@@ -454,28 +490,28 @@ class ConTodo {
                                 subArg = `"${subArg}"`;
                                 subType = "array-string";
                             }
-                            newLog.append(this.makeEntrySpan(subType, subArg));
+                            newLog.append(this.#makeEntrySpan(subType, subArg));
                         }
 
                         else {
-                            this.analyzeInputMakeSpan(subArg, newLog);
+                            this.#analyzeInputMakeSpan(subArg, newLog);
                         }
 
                         if (!j) {
-                            newLog.append(this.makeEntrySpan("object", ": "));
+                            newLog.append(this.#makeEntrySpan("object", ": "));
                         }
                     });
                     
                     if (i < lastIndex) {
-                        newLog.append(this.makeEntrySpan("object", ", "));
+                        newLog.append(this.#makeEntrySpan("object", ", "));
                     }
                 });
-                newLog.append(this.makeEntrySpan("object", " }"));
+                newLog.append(this.#makeEntrySpan("object", " }"));
             }
             
             else {
                 this.defaultConsole.error("You found an edge case, which is not covered yet.\nPlease create an issue mentioning your input at:\nhttps://github.com/UmamiAppearance/HTMLConsole/issues");
-                newLog.append(this.makeEntrySpan("string", arg));
+                newLog.append(this.#makeEntrySpan("string", arg));
             }
         }
 
@@ -515,21 +551,21 @@ class ConTodo {
             
             if (isClass) {
                 if (hasConstructor) {
-                    newLog.append(this.makeEntrySpan("function", `class ${arg.name} { constructor(`));
-                    newLog.append(this.makeEntrySpan("fn-args", params));
-                    newLog.append(this.makeEntrySpan("function", ") }"));
+                    newLog.append(this.#makeEntrySpan("function", `class ${arg.name} { constructor(`));
+                    newLog.append(this.#makeEntrySpan("fn-args", params));
+                    newLog.append(this.#makeEntrySpan("function", ") }"));
                 } else {
-                    newLog.append(this.makeEntrySpan("function", `class ${arg.name} {}`));
+                    newLog.append(this.#makeEntrySpan("function", `class ${arg.name} {}`));
                 }
             } else {
-                newLog.append(this.makeEntrySpan("function", `function ${arg.name}(`));
-                newLog.append(this.makeEntrySpan("fn-args", params));
-                newLog.append(this.makeEntrySpan("function", ")"));
+                newLog.append(this.#makeEntrySpan("function", `function ${arg.name}(`));
+                newLog.append(this.#makeEntrySpan("fn-args", params));
+                newLog.append(this.#makeEntrySpan("function", ")"));
             }
         }
 
         else if (argType === "undefined") {
-            newLog.append(this.makeEntrySpan("null", "undefined"));
+            newLog.append(this.#makeEntrySpan("null", "undefined"));
         }
 
         
@@ -552,56 +588,8 @@ class ConTodo {
             else if (isNaN(arg)) {
                 argType = "null";
             }
-            newLog.append(this.makeEntrySpan(argType, arg));
+            newLog.append(this.#makeEntrySpan(argType, arg));
         }
-    }
-
-    /**
-     * Creates standard logs for:
-     *  - console.error
-     *  - console.info
-     *  - console.log
-     *  - console.table (if no iterable was provided)
-     *  - console.warn
-     * @param {*} type 
-     * @param  {...any} args 
-     */
-    logToNode(type, ...args) {
-        const newLog = this.makeDivLogEntry(type);
-        const start = (type === "log") ? 0 : 1;
-        const last = args.length-1;
-        this.defaultConsole.log("LAST", last);
-
-        // The leading symbol is handled separately here
-        // (Only "console.log" starts ar index 0)
-        if (start === 1) {
-            newLog.append(this.makeEntrySpan("info", args[0]));
-            newLog.append(this.makeEntrySpan("space", " "));
-        }
-
-        // An empty log call only logs an empty space.
-        // (It has to log something, otherwise the node 
-        // would collapse)
-        if (last < 0) {
-            newLog.append(this.makeEntrySpan("space", " "));
-        }
-
-        // For every other call every input is getting 
-        // analyzed by "analyzeInputMakeSpan" which also
-        // appends the content. Every node is followed
-        // by a space (except the very last).
-        else {
-            for (let i=start; i<=last; i++) {
-                this.analyzeInputMakeSpan(args[i], newLog);
-
-                if (i !== last) {
-                    newLog.append(this.makeEntrySpan("space", " "));
-                }
-            }
-        }
-
-        // Finally scroll to the current log
-        newLog.scrollIntoView();
     }
 
 
@@ -612,7 +600,7 @@ class ConTodo {
      * @param {*} data 
      * @param {*} header 
      */
-    logHTMLTable(data, header) {
+    #genHTMLTable(data, header) {
         const table = document.createElement("table");
         
         const tHead = document.createElement("thead");
@@ -645,12 +633,17 @@ class ConTodo {
         table.append(tBody);
 
 
-        let divLog = this.makeDivLogEntry();
+        let divLog = this.#makeDivLogEntry();
         divLog.append(table);
 
         table.scrollIntoView();
     }
 
+    /**
+     * 
+     * @param {*} label 
+     * @returns 
+     */
     #makeLabelStr(label) {
         if (typeof label === "undefined") {
             label = "default";
@@ -810,21 +803,21 @@ class ConTodo {
         lenLeft++;
 
         // html trace
-        const newLog = this.makeDivLogEntry();
-        newLog.append(this.makeEntrySpan("trace-head", "console.trace()"));
+        const newLog = this.#makeDivLogEntry();
+        newLog.append(this.#makeEntrySpan("trace-head", "console.trace()"));
 
         for (const arg of args) {
-            newLog.append(this.makeEntrySpan("space", " "));
-            this.analyzeInputMakeSpan(arg, newLog);
+            this.#makeSpaceSpan(newLog);
+            this.#analyzeInputMakeSpan(arg, newLog);
         }
 
         newLog.append("\n");
 
         for (const line of stackArr) {
-            newLog.append(this.makeEntrySpan("space", "  "));
-            newLog.append(this.makeEntrySpan("trace-name", line.name));
-            newLog.append(this.makeEntrySpan("space", " ".repeat(lenLeft-line.len)));
-            newLog.append(this.makeEntrySpan("trace-file", line.file));
+            this.#makeSpaceSpan(newLog);
+            newLog.append(this.#makeEntrySpan("trace-name", line.name));
+            this.#makeSpaceSpan(newLog, lenLeft-line.len);
+            newLog.append(this.#makeEntrySpan("trace-file", line.file));
             newLog.append("\n");
         }
 

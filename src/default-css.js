@@ -52,7 +52,7 @@ const defaultCSS = `
 }
 .contodo.default table {
     width: 100%;
-    text-align: right;
+    text-align: left;
     border-spacing: 0;
     border-collapse: collapse;
     border: 2px #333;
@@ -67,6 +67,7 @@ const defaultCSS = `
 .contodo.default th, .contodo.default td {
     padding: 3px 0;
     border: 1px solid rgba(157, 157, 157, 0.2);
+    width: 1%;
 }
 `;
 
