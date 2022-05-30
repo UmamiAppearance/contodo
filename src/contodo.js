@@ -430,8 +430,9 @@ class ConTodo {
      * thought of...
      * @param {*} input - Input Arguments. 
      */
-    #foundEdgeCaseError() {
+    #foundEdgeCaseError(input) {
         console.error("You found an edge case, which is not covered yet.\nPlease create an issue mentioning your input at:\nhttps://github.com/UmamiAppearance/contodo/issues");
+        this.defaultConsole.warn(input);
         
     }
 
@@ -541,7 +542,7 @@ class ConTodo {
 
             // Unexpected Object Type
             else {
-                this.#foundEdgeCaseError();
+                this.#foundEdgeCaseError(arg);
             }
         }
 
@@ -630,10 +631,6 @@ class ConTodo {
                 argType = "null";
             }
 
-            // Unexpected Type
-            else {
-                this.#foundEdgeCaseError(arg);
-            }
             newLog.append(this.#makeEntrySpan(argType, arg));
         }
     }
