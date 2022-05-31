@@ -1,6 +1,6 @@
 import { terser } from "rollup-plugin-terser";
 import { string } from "rollup-plugin-string";
-import stripCode from "rollup-plugin-strip-code";
+import stripCode from "rollup-plugin-import-manager";
 
 const exports = {
     input: "./src/contodo.js",

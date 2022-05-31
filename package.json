@@ -29,7 +29,6 @@
   },
   "homepage": "https://github.com/UmamiAppearance/contodo#readme",
   "devDependencies": {
-    "@rollup/plugin-replace": "^4.0.0",
     "eslint": "^8.15.0",
     "no-bro-cote": "^0.1.1",
     "rollup": "^2.75.1",
