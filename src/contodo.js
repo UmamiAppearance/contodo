@@ -17,7 +17,7 @@ import defaultCSS from "./default-css.js";
  * are not available. Every other method can be rendered
  * into a document node.
  *
- * Inspired by https://github.com/bahmutov/console-log-div
+ * Inspired by: https://github.com/bahmutov/console-log-div
  */
 class ConTodo {
 
@@ -41,18 +41,25 @@ class ConTodo {
 
         // (Default) Options
         this.options = {
-            applyCSS: hasOption("applyCSS") ? Boolean(options.applyCSS) : true,
             autostart: hasOption("autostart") ? Boolean(options.autostart) : true,
             catchErrors: hasOption("catchErrors") ? Boolean(options.catchErrors) : false,
             height: hasOption("height") ? options.height : "inherit",
             maxEntries: hasOption("maxEntries") ? Math.max(parseInt(Number(options.maxEntries), 10), 0) : 0,
             preventDefault: hasOption("preventDefault") ? Boolean(options.preventDefault) : false,
             reversed: hasOption("reversed") ? Boolean(options.reversed) : false,
-            style: hasOption("style") ? options.style : "default",
             showDebugging: hasOption("showDebugging") ? Boolean(options.showDebugging) : true,
             showTimestamp: hasOption("showTimestamp") ? Boolean(options.showTimestamp) : false,
             width: hasOption("width") ? options.width : "inherit"
         };
+
+        if (typeof defaultCSS === "string") {
+            this.options.applyCSS = hasOption("applyCSS") ? Boolean(options.applyCSS) : true;
+        } else {
+            if (hasOption("applyCSS")) {
+                console.warn("Build css is not available. Option 'applyCSS' was ignored.")
+            }
+            this.options.applyCSS = false;
+        }
         
         // Store Default Console Methods
         this.defaultConsole = {
@@ -98,7 +105,7 @@ class ConTodo {
         if (!this.mainElem) {
             this.mainElem = document.createElement("code");
             this.parentNode.append(this.mainElem);
-            this.mainElem.classList.add("contodo", this.options.style);
+            this.mainElem.classList.add("contodo");
             this.mainElem.style.height = this.options.height;
             this.logCount = 0;
         }
