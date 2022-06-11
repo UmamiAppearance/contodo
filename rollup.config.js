@@ -1,6 +1,6 @@
 import { terser } from "rollup-plugin-terser";
 import { string } from "rollup-plugin-string";
-import stripCode from "rollup-plugin-import-manager";
+import { manager } from "rollup-plugin-import-manager";
 
 const exports = {
     input: "./src/contodo.js",
@@ -29,7 +29,7 @@ const exports = {
         },
     ],
     plugins: [
-        stripCode({
+        manager({
             pattern: "import defaultCSS from \"./default-css.js\";",
 
         }),

@@ -1,3 +1,4 @@
+//modified
 /**
  * The original of this beast can be admired here:
  * https://stackoverflow.com/a/9337047
@@ -23,14 +24,15 @@ const isPositiveInteger = (input) => {
     return (Number.isInteger(input) && input > 0);
 };
 
-/**
- * [contodo]{@link https://github.com/UmamiAppearance/contodo}
- *
- * @version 0.1.0
- * @author UmamiAppearance [mail@umamiappearance.eu]
- * @license GPL-3.0
- */
+//modified
+const response = await fetch("../themes/default.css");
+        
+if (!response.ok) {
+    throw Error(response);
+}
+const defaultCSS = await response.text();
 
+//modified
 //import defaultCSS from "../themes/default.css";
 
 /**
