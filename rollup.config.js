@@ -29,8 +29,10 @@ const exports = {
         },
     ],
     plugins: [
+        string({
+            include: "**/*.css",
+        }),
         importManager({
-            showDiff: null,
             units: {
                 module: "default-css",
                 actions: {
@@ -38,10 +40,6 @@ const exports = {
                     rename: "../themes/default.css"
                 }
             }
-        }),
-        string({
-            // Required to be specified
-            include: "**/*.css",
         })
     ]
 };
