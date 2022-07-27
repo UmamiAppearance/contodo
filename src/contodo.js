@@ -8,7 +8,7 @@
 
 import { isIdentifier, isPositiveInteger } from "./utils.js";
 import defaultCSS from "./default-css.js";
-//import defaultCSS from "../themes/default.css";
+
 
 /**
  * Creates a html node which displays browser console
@@ -57,7 +57,7 @@ class ConTodo {
             this.options.applyCSS = hasOption("applyCSS") ? Boolean(options.applyCSS) : true;
         } else {
             if (hasOption("applyCSS")) {
-                console.warn("Build css is not available. Option 'applyCSS' was ignored.")
+                console.warn("Build css is not available. Option 'applyCSS' was ignored.");
             }
             this.options.applyCSS = false;
         }

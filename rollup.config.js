@@ -1,11 +1,11 @@
 import { terser } from "rollup-plugin-terser";
 import { string } from "rollup-plugin-string";
-import { manager } from "rollup-plugin-import-manager";
+import { importManager } from "rollup-plugin-import-manager";
 
 const exports = {
     input: "./src/contodo.js",
     output: [ 
-        /*{   
+        {   
             format: "iife",
             name: "contodo",
             file: "./dist/contodo.iife.js"
@@ -15,7 +15,7 @@ const exports = {
             name: "contodo",
             file: "./dist/contodo.iife.min.js",
             plugins: [terser()]
-        },*/
+        },
         {   
             format: "es",
             name: "contodo",
@@ -29,9 +29,15 @@ const exports = {
         },
     ],
     plugins: [
-        manager({
-            pattern: "import defaultCSS from \"./default-css.js\";",
-
+        importManager({
+            showDiff: null,
+            units: {
+                module: "default-css",
+                actions: {
+                    select: "module",
+                    rename: "../themes/default.css"
+                }
+            }
         }),
         string({
             // Required to be specified
@@ -41,3 +47,5 @@ const exports = {
 };
 
 export default exports;
+
+//import defaultCSS from "../themes/default.css";
