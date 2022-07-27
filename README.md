@@ -78,5 +78,6 @@ Default: `{}`
 
 
 ## Themes
-Themes can be found [here](./themes/). Right now there is only the default theme available, but feel free to make one if you don't like the default design. The default is baked into the build file. Attaching it to the document body can be disabled by passing the [option](#options) `applyCSS: false`. Also there are builds available without build in css.  
-If you like to build your own copy with custom css, modify the [`default.css`](./themes/default.css) before [building](#builds).
+Themes can be found [here](./themes/). Right now there is only the default theme available, but feel free to make one if you don't like the default design. The default is baked into the build file. Attaching it to the document body can be disabled by passing the [option](#options-1) `applyCSS: false`. Also there are builds available without build in css.  
+If you like to build your own copy of **contodo** with custom css included, modify the [`default.css`](./themes/default.css) before [building](#builds).
+
