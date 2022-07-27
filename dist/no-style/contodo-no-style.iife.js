@@ -27,8 +27,6 @@ var contodo = (function () {
         return (Number.isInteger(input) && input > 0);
     };
 
-    var defaultCSS = ".contodo {\n    position: inherit;\n    display: block;\n    font-family: monospace;\n    font-size: inherit;\n    min-width: 100px;\n    min-height: 100px;\n    white-space: break-spaces;\n    overflow: auto;\n    margin: auto;\n    background-color: #fff;\n    color: black;\n    padding: 1px;\n}\n.contodo > .log {\n    border-color: rgba(157, 157, 157, 0.2);\n    border-width: 0 0 1pt 0;\n    border-style: solid;\n    padding: 2px 5px;\n}\n.contodo > .log:first-child {\n    border-width: 1pt 0;\n}\n.contodo > .warn {\n    background-color: #fafab4;\n}\n.contodo > .warn > span.string {\n    color: #505000;\n}\n.contodo > .error {\n    background-color: #f0c8c8;\n}\n.contodo > .error > span.string {\n    color: rgb(100, 0, 0);\n}\n.contodo > .time {\n    opacity: 0.5;\n    font-size: 80%;\n}\n.contodo .null {\n    color: #808080;\n}\n.contodo .number, .contodo .bigint, .contodo .object, .contodo .boolean {\n    color: #32963c;\n}\n.contodo .array-string, .contodo .fn-args, .contodo .symbol, .contodo .trace-head {\n    color: #f0f;\n}\n.contodo .function, .contodo .object, .contodo .trace-file {\n    color: #2864fa;\n}\n.contodo table {\n    width: 100%;\n    text-align: left;\n    border-spacing: 0;\n    border-collapse: collapse;\n    border: 2px #333;\n    border-style: solid none;\n}\n.contodo thead, .contodo th {\n    font-weight: 700;\n}\n.contodo thead > tr, .contodo tr:nth-child(even) {\n    background-color: rgba(200, 200, 220, 0.1);\n}\n.contodo th, .contodo td {\n    padding: 3px 0;\n    border: 1px solid rgba(157, 157, 157, 0.2);\n    width: 1%;\n}\n";
-
     /**
      * [contodo]{@link https://github.com/UmamiAppearance/contodo}
      *
@@ -81,8 +79,13 @@ var contodo = (function () {
                 width: hasOption("width") ? options.width : "inherit"
             };
 
-            {
+            if (typeof defaultCSS === "string") {
                 this.options.applyCSS = hasOption("applyCSS") ? Boolean(options.applyCSS) : true;
+            } else {
+                if (hasOption("applyCSS")) {
+                    console.warn("Build css is not available. Option 'applyCSS' was ignored.");
+                }
+                this.options.applyCSS = false;
             }
             
             // Store Default Console Methods
