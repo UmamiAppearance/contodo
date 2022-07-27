@@ -1,0 +1,70 @@
+.contodo {
+    position: inherit;
+    display: block;
+    font-family: monospace;
+    font-size: inherit;
+    min-width: 100px;
+    min-height: 100px;
+    white-space: break-spaces;
+    overflow: auto;
+    margin: auto;
+    background-color: #fff;
+    color: black;
+    padding: 1px;
+}
+.contodo > .log {
+    border-color: rgba(157, 157, 157, 0.2);
+    border-width: 0 0 1pt 0;
+    border-style: solid;
+    padding: 2px 5px;
+}
+.contodo > .log:first-child {
+    border-width: 1pt 0;
+}
+.contodo > .warn {
+    background-color: #fafab4;
+}
+.contodo > .warn > span.string {
+    color: #505000;
+}
+.contodo > .error {
+    background-color: #f0c8c8;
+}
+.contodo > .error > span.string {
+    color: rgb(100, 0, 0);
+}
+.contodo > .time {
+    opacity: 0.5;
+    font-size: 80%;
+}
+.contodo .null {
+    color: #808080;
+}
+.contodo .number, .contodo .bigint, .contodo .object, .contodo .boolean {
+    color: #32963c;
+}
+.contodo .array-string, .contodo .fn-args, .contodo .symbol, .contodo .trace-head {
+    color: #f0f;
+}
+.contodo .function, .contodo .object, .contodo .trace-file {
+    color: #2864fa;
+}
+.contodo table {
+    width: 100%;
+    text-align: left;
+    border-spacing: 0;
+    border-collapse: collapse;
+    border: 2px #333;
+    border-style: solid none;
+}
+.contodo thead, .contodo th {
+    font-weight: 700;
+}
+.contodo thead > tr, .contodo tr:nth-child(even) {
+    background-color: rgba(200, 200, 220, 0.1);
+}
+.contodo th, .contodo td {
+    padding: 3px 0;
+    border: 1px solid rgba(157, 157, 157, 0.2);
+    width: 1%;
+}
