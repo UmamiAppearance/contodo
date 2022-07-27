@@ -2,7 +2,7 @@
   "name": "contodo",
   "version": "0.1.0",
   "description": "HTML Console. Let's you output your browser console to a document node.",
-  "browser": "scr/contodo.js",
+  "browser": "./scr/contodo.js",
   "type": "module",
   "directories": {
     "example": "./examples",
@@ -30,7 +30,7 @@
   "homepage": "https://github.com/UmamiAppearance/contodo#readme",
   "devDependencies": {
     "eslint": "^8.20.0",
-    "no-bro-cote": "^0.1.1",
+    "no-bro-cote": "^0.1.4",
     "rollup": "^2.77.2",
     "rollup-plugin-import-manager": "^0.1.2",
     "rollup-plugin-string": "^3.0.0",

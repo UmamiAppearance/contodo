@@ -4,7 +4,8 @@
  * 
  * For objects it is legal to use "const, if, ..."
  * so this could be removed. A dollar sign though
- * must be inside of a string and was also removed. 
+ * must be inside of a string and was also removed
+ * from the original regex. 
  */
 
 /* eslint-disable no-misleading-character-class */

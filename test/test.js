@@ -2,7 +2,7 @@ import NoBroCote from "no-bro-cote";
 
 const test = new NoBroCote(import.meta.url);
 
-test.addImport("import { HTMLConsole } from './src/html-console.js'");
+test.addImport("import ConTodo from './dist/contodo.esm.js'");
 
 test.makeUnit(
     "logTest",
@@ -10,10 +10,9 @@ test.makeUnit(
     () => {
         const logInput = "test";
         // eslint-disable-next-line no-undef
-        const htmlConsole = new HTMLConsole();
+        const contodo = new ConTodo();
         console.log(logInput);
-        const output = htmlConsole.mainElem.childNodes[0].textContent;
-        return output;
+        return contodo.mainElem.childNodes[0].textContent;
     }
 );
 
