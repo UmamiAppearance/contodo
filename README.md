@@ -1,4 +1,9 @@
 # contodo
+
+[![License](https://img.shields.io/github/license/UmamiAppearance/contodo?color=009911&style=for-the-badge)](./LICENSE)
+[![npm](https://img.shields.io/npm/v/contodo?color=%23009911&style=for-the-badge)](https://www.npmjs.com/package/contodo)
+
+
 _HTML Console._ Let's you output your browser **con**sole **to** a **do**cument node.
 
 ## Installation
@@ -82,3 +87,6 @@ Default: `{}`
 Themes can be found [here](./themes/). Right now there is only the default and a dark theme available, but feel free to make one if you don't like the designs. The default is baked into the build file. Attaching it to the document body can be disabled by passing the [option](#options-1) `applyCSS: false`. Also there are builds available without build in css.  
 If you like to build your own copy of **contodo** with custom css included, modify the [`default.css`](./themes/default.css) before [building](#builds).
 
+
+## License
+This work is licensed under [GPL-3.0](https://opensource.org/licenses/GPL-3.0).
