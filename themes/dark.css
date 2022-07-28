@@ -8,12 +8,12 @@
     white-space: break-spaces;
     overflow: auto;
     margin: auto;
-    background-color: #fff;
-    color: black;
+    background-color: #16161d;
+    color: yellow;
     padding: 1px;
 }
 .contodo > .log {
-    border-color: rgba(157, 157, 157, 0.2);
+    border-color: rgba(157, 157, 157, 0.5);
     border-width: 0 0 1pt 0;
     border-style: solid;
     padding: 2px 5px;
@@ -22,32 +22,32 @@
     border-width: 1pt 0;
 }
 .contodo > .warn {
-    background-color: #fafab4;
+    background-color: #95952b;
 }
 .contodo > .warn > span.string {
-    color: #505000;
+    color: #fafab4;
 }
 .contodo > .error {
-    background-color: #f0c8c8;
+    background-color: #882020;
 }
 .contodo > .error > span.string {
-    color: #640000;
+    color: #f0c8c8;
 }
 .contodo > .time {
     opacity: 0.5;
     font-size: 80%;
 }
 .contodo .null {
-    color: #808080;
+    color: #c4c4c4;
 }
 .contodo .number, .contodo .bigint, .contodo .object, .contodo .boolean {
-    color: #32963c;
+    color: #1f2;
 }
 .contodo .array-string, .contodo .fn-args, .contodo .symbol, .contodo .trace-head {
     color: #f0f;
 }
 .contodo .function, .contodo .object, .contodo .trace-file {
-    color: #2864fa;
+    color: #18f;
 }
 .contodo table {
     width: 100%;

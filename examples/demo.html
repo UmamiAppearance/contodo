@@ -6,6 +6,7 @@
         <title>contodo - demo page</title>
         
         <link href="https://umamiappearance.github.io/MSG/MSG.css" rel="stylesheet">
+
         <style>
             html {
                 height: 100%;
@@ -36,11 +37,14 @@
                 border-radius: 4px;
                 display: block;
                 padding: 5px;
-                margin: 0 auto 40px auto;
+                margin: 0 auto 5px auto;
                 width: 300px;
                 opacity: 1;
                 transition: opacity 2000ms;
                 cursor: not-allowed;
+            }
+            code:last-child {
+                transition: all 400ms;
             }
             footer {
                 text-align: right;
@@ -60,7 +64,14 @@
         <main>
             
             <code id="first-input" title="Use the console of your browser..."></code>
-            
+
+            <p style="width: 632px; margin: auto;">
+                <label for="theme" style="font-weight: bold;">Theme:</label>
+                <select id="theme">
+                    <option selected>default</option>
+                    <option>dark</option>
+                </select>
+            </p>
             <fieldset>
                 <legend>&nbsp;console output&nbsp;</legend>
             </fieldset>
@@ -82,11 +93,29 @@
         import ConTodo from "../src/contodo.js";
 
         const options = {
+            applyCSS: false,
             catchErrors: true,
             height: "360px"
         }
         const htmlConsole = new ConTodo(document.querySelector("fieldset"), options);
         
+
+        const theme = document.querySelector("#theme");
+        const setTheme = () => {
+            const prevStyle = document.head.querySelector("#theme-style");
+            if (prevStyle) {
+                prevStyle.setAttribute("href", `../themes/${theme.value}.css`);
+            } else {
+                const style = document.createElement("link");
+                style.id = "theme-style";
+                style.setAttribute("rel", "stylesheet");
+                style.setAttribute("href", `../themes/${theme.value}.css`);
+                document.head.append(style);
+            }
+        }
+        theme.addEventListener("change", setTheme);
+        setTheme();
+
         const firstInput = document.querySelector("#first-input");
         
         firstInput.textContent = ">> ";
