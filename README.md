@@ -1,6 +1,5 @@
 # contodo
 
-[![License](https://img.shields.io/github/license/UmamiAppearance/contodo?color=009911&style=for-the-badge)](./LICENSE)
 [![npm](https://img.shields.io/npm/v/contodo?color=%23009911&style=for-the-badge)](https://www.npmjs.com/package/contodo)
 
 _HTML Console._ Let's you output your browser **con**sole **to** a **do**cument node.
