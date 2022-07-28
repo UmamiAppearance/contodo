@@ -3,8 +3,8 @@
 [![License](https://img.shields.io/github/license/UmamiAppearance/contodo?color=009911&style=for-the-badge)](./LICENSE)
 [![npm](https://img.shields.io/npm/v/contodo?color=%23009911&style=for-the-badge)](https://www.npmjs.com/package/contodo)
 
-
 _HTML Console._ Let's you output your browser **con**sole **to** a **do**cument node.
+
 
 ## Installation
 ### GitHub
@@ -21,7 +21,6 @@ nmp install base-ex
 The GitHub repository has ready to use builds included. You can find them in [dist](https://github.com/UmamiAppearance/contodo/tree/main/dist). The npm package comes without pre build files. 
 
 For building run:
-
 ```sh
 npm run build
 ```
@@ -51,8 +50,10 @@ First either import the esm-module or add the iife script tag to the html page. 
     const contodo = new ConTodo();
 </script>
 ```
+
 ### Demo
 A demo can be found [here](https://umamiappearance.github.io/contodo/examples/demo.html).
+
 
 ## Options
 `new ConTodo(node[, options])`
@@ -62,7 +63,6 @@ Type: `Object`
 Default: `null`  
 
 Pass a document node on which **contodo** should be attached to. If nothing or a _nullish_ value is passed, the console gets attached to to the document body.
-
 
 ### `options`
 Type: `Object`  
