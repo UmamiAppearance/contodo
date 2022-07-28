@@ -1,6 +1,6 @@
 {
   "name": "contodo",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "HTML Console. Let's you output your browser console to a document node.",
   "browser": "./scr/contodo.js",
   "type": "module",
