@@ -1,9 +1,17 @@
 var contodo = (function () {
     'use strict';
 
-    /**
-     * The original of this beast can be admired here:
-     * https://stackoverflow.com/a/9337047
+    const isPositiveInteger = (input) => {
+        input = Number(input);
+        if (isNaN(input)) {
+            return false;
+        }
+        return (Number.isInteger(input) && input > 0);
+    };
+
+
+    /* The original of the followng beast can be admired
+     * here: https://stackoverflow.com/a/9337047
      * 
      * For objects it is legal to use "const, if, ..."
      * so this could be removed. A dollar sign though
@@ -18,19 +26,10 @@ var contodo = (function () {
         return Boolean(match);
     };
 
-
-    const isPositiveInteger = (input) => {
-        input = Number(input);
-        if (isNaN(input)) {
-            return false;
-        }
-        return (Number.isInteger(input) && input > 0);
-    };
-
     /**
      * [contodo]{@link https://github.com/UmamiAppearance/contodo}
      *
-     * @version 0.1.1
+     * @version 0.1.3
      * @author UmamiAppearance [mail@umamiappearance.eu]
      * @license GPL-3.0
      */
