@@ -1,8 +1,11 @@
 {
   "name": "contodo",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "HTML Console. Let's you output your browser console to a document node.",
-  "browser": "./scr/contodo.js",
+  "browser": "./dist/contodo.esm.js",
+  "exports": {
+    "browser": "./dist/contodo.esm.js"
+  },
   "type": "module",
   "directories": {
     "example": "./examples",

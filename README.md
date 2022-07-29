@@ -18,19 +18,20 @@ nmp install base-ex
 ```
 
 ## Builds
-The GitHub repository has ready to use builds included. You can find them in [dist](https://github.com/UmamiAppearance/contodo/tree/main/dist). The npm package comes without pre build files. 
+Builds can be find them in the directory dist ([github:dist](https://github.com/UmamiAppearance/contodo/tree/main/dist)). 
 
-For building run:
+If you want to build your own copy run:
 ```sh
 npm run build
 ```
 
-Either way you have two builds available ([esm](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Modules) and [iife](https://developer.mozilla.org/en-US/docs/Glossary/IIFE)), plus a minified version of each. 
+You have two builds available ([esm](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Modules) and [iife](https://developer.mozilla.org/en-US/docs/Glossary/IIFE)), plus a minified version of each. 
 * ``contodo.esm.js``
 * ``contodo.esm.min.js``
 * ``contodo.iife.js``
 * ``contodo.iife.min.js``
 
+Also in subfolder _no-style_ ([github:dist/no-style](https://github.com/UmamiAppearance/contodo/tree/main/dist/no-style)), there are builds available without build in css.
 
 ## Usage
 First either import the esm-module or add the iife script tag to the html page. After that, the constructor ***ConTodo** is available and ready to use:
@@ -55,20 +56,19 @@ First either import the esm-module or add the iife script tag to the html page. 
 A demo can be found [here](https://umamiappearance.github.io/contodo/examples/demo.html).
 
 
-## Options
+### Options
 `new ConTodo(node[, options])`
 
-### `node`
+#### `node`
 Type: `Object`  
 Default: `null`  
 
 Pass a document node on which **contodo** should be attached to. If nothing or a _nullish_ value is passed, the console gets attached to to the document body.
 
-### `options`
+#### `options`
 Type: `Object`  
 Default: `{}`  
 
-##### arguments:
 | key            | type                 | default     | effect                                                   |
 | -------------- | -------------------- | ----------- | -------------------------------------------------------- |
 | applyCSS       | _Boolean_            | `true`      | applies the build in css to the document                 |
@@ -81,6 +81,31 @@ Default: `{}`
 | showDebugging  | _Boolean_            | `true`      | displays `console.debug` messages                        |
 | showTimestamp  | _Boolean_            | `false`     | adds a timestamp to every log                            |
 | width          | _String (css-value)_ | `"inherit"` | css value for style width of the console node            |
+
+### Methods
+
+#### `createDocumentNode`
+Creates the main document node and appends it to the provided [`node`](#node) or the document body if nothing is provided.  
+The method is called during initialization if the [`option`](#options-1) `autostart` is set.  
+If the build in css is available and the [`option`](#options-1) `applyCSS` is set to true, method [`applyCSS`](#applycss) is getting called by this method.
+
+#### `destroyDocumentNode`
+Destroys the main node. Also resets the browser console to its default state by calling [`restoreDefaultConsole`](#restoreDefaultConsole).
+
+#### `initFunctions`
+Replaces default console methods with the contodo methods. The method is called during initialization if the [`option`](#options-1) `autostart` is set.
+
+#### `restoreDefaultConsole`
+Resets the browser console to its default state.
+
+#### `applyCSS`
+Applies the build in CSS to document header if available and not already applied. This method is automatically getting called by [`createDocumentNode`](#createdocumentnode).
+
+#### `removeCSS`
+Removes former applied build in css.
+
+#### Api Reference
+Apart from `console.dir/dirxml` and `console.group` has all methods of a browsers console available **contodo**. A reference of those methods can be found [here](https://developer.mozilla.org/en-US/docs/Web/API/Console).
 
 
 ## Themes
