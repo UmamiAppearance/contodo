@@ -8,9 +8,11 @@
   },
   "type": "module",
   "directories": {
-    "example": "./examples",
+    "dist": "./dist",
+    "examples": "./examples",
     "src": "./src",
-    "test": "./test"
+    "test": "./test",
+    "themes": "./themes"
   },
   "scripts": {
     "build": "rollup -c",
