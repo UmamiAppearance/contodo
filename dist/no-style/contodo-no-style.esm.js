@@ -26,7 +26,7 @@ const isIdentifier = (str) => {
 /**
  * [contodo]{@link https://github.com/UmamiAppearance/contodo}
  *
- * @version 0.1.3
+ * @version 0.1.4
  * @author UmamiAppearance [mail@umamiappearance.eu]
  * @license GPL-3.0
  */
@@ -804,13 +804,15 @@ class ConTodo {
     /**
      * console.clear
      */
-    clear() {
-        if (!this.options.preventDefault) {
+    clear(info=true) {
+        if (!this.options.preventDefault && info) {
             this.defaultConsole.clear();
         }
         this.mainElem.innerHTML = "";
         this.logCount = 0;
-        this.makeLog("log", ["Console was cleared"], true);
+        if (info) {
+            this.makeLog("log", ["Console was cleared"], true);
+        }
     }
 
     /**
