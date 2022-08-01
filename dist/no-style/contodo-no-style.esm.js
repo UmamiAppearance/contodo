@@ -26,7 +26,7 @@ const isIdentifier = (str) => {
 /**
  * [contodo]{@link https://github.com/UmamiAppearance/contodo}
  *
- * @version 0.1.4
+ * @version 0.1.5
  * @author UmamiAppearance [mail@umamiappearance.eu]
  * @license GPL-3.0
  */
@@ -306,7 +306,7 @@ class ConTodo {
         });
 
         // Finally scroll to the current log
-        newLog.scrollIntoView();
+        this.#scroll();
     }
 
 
@@ -726,7 +726,7 @@ class ConTodo {
         let divLog = this.#makeDivLogEntry();
         divLog.append(table);
 
-        table.scrollIntoView();
+        this.#scroll();
     }
 
     /**
@@ -743,6 +743,18 @@ class ConTodo {
             label = String(label);
         }
         return label;
+    }
+
+
+    /**
+     * Scroll a new log into view. 
+     */
+    #scroll() {
+        if (this.options.reversed) {
+            this.mainElem.scrollTop = 0;
+        } else {
+            this.mainElem.scrollTop = this.mainElem.scrollHeight;
+        }
     }
 
     /**
@@ -979,7 +991,7 @@ class ConTodo {
             newLog.append("\n");
         }
 
-        newLog.scrollIntoView();
+        this.#scroll();
         
         // default console trace
         if (!this.options.preventDefault) {

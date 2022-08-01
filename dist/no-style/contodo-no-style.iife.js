@@ -29,7 +29,7 @@ var contodo = (function () {
     /**
      * [contodo]{@link https://github.com/UmamiAppearance/contodo}
      *
-     * @version 0.1.4
+     * @version 0.1.5
      * @author UmamiAppearance [mail@umamiappearance.eu]
      * @license GPL-3.0
      */
@@ -309,7 +309,7 @@ var contodo = (function () {
             });
 
             // Finally scroll to the current log
-            newLog.scrollIntoView();
+            this.#scroll();
         }
 
 
@@ -729,7 +729,7 @@ var contodo = (function () {
             let divLog = this.#makeDivLogEntry();
             divLog.append(table);
 
-            table.scrollIntoView();
+            this.#scroll();
         }
 
         /**
@@ -746,6 +746,18 @@ var contodo = (function () {
                 label = String(label);
             }
             return label;
+        }
+
+
+        /**
+         * Scroll a new log into view. 
+         */
+        #scroll() {
+            if (this.options.reversed) {
+                this.mainElem.scrollTop = 0;
+            } else {
+                this.mainElem.scrollTop = this.mainElem.scrollHeight;
+            }
         }
 
         /**
@@ -982,7 +994,7 @@ var contodo = (function () {
                 newLog.append("\n");
             }
 
-            newLog.scrollIntoView();
+            this.#scroll();
             
             // default console trace
             if (!this.options.preventDefault) {

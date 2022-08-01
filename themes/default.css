@@ -11,6 +11,7 @@
     background-color: #fff;
     color: black;
     padding: 1px;
+    scroll-behavior: smooth;
 }
 .contodo > .log {
     border-color: rgba(157, 157, 157, 0.2);
