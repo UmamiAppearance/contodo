@@ -46,7 +46,7 @@ First either import the esm-module or add the iife script tag to the html page. 
     });
 </script>
 ```
-#### CDN (jsdelivr)
+##### CDN (jsdelivr)
 ```html
 <script type="module">
     import ConTodo from "https://cdn.jsdelivr.net/npm/contodo@0.2.0/dist/contodo.esm.min.js";
@@ -67,7 +67,7 @@ First either import the esm-module or add the iife script tag to the html page. 
 </script>
 ```
 
-#### CDN (jsdelivr)
+##### CDN (jsdelivr)
 ```html
 <script src="https://cdn.jsdelivr.net/npm/contodo@0.2.0/dist/contodo.iife.min.js"></script>
 <script>
