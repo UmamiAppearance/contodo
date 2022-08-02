@@ -33,6 +33,7 @@ You have two builds available ([esm](https://developer.mozilla.org/en-US/docs/We
 
 Also in subfolder _no-style_ ([github:dist/no-style](https://github.com/UmamiAppearance/contodo/tree/main/dist/no-style)), there are builds available without build in css.
 
+
 ## Usage
 First either import the esm-module or add the iife script tag to the html page. After that, the constructor ***ConTodo** is available and ready to use:
 
@@ -40,17 +41,42 @@ First either import the esm-module or add the iife script tag to the html page. 
 ```html
 <script type="module">
     import ConTodo from "./<path>/contodo.esm.min.js";
-    const contodo = new ConTodo();
+    document.addEventListener("DOMContentLoaded", () => {
+        const contodo = new ConTodo();
+    });
 </script>
 ```
+#### CDN (jsdelivr)
+```html
+<script type="module">
+    import ConTodo from "https://cdn.jsdelivr.net/npm/contodo@0.2.0/dist/contodo.esm.min.js";
+    document.addEventListener("DOMContentLoaded", () => {
+        const contodo = new ConTodo();
+    });
+</script>
+```
+
 
 ### IIFE
 ```html
 <script src="./<path>/contodo.iife.min.js"></script>
 <script>
-    const contodo = new ConTodo();
+    document.addEventListener("DOMContentLoaded", () => {
+        const contodo = new ConTodo();
+    });
 </script>
 ```
+
+#### CDN (jsdelivr)
+```html
+<script src="https://cdn.jsdelivr.net/npm/contodo@0.2.0/dist/contodo.iife.min.js"></script>
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+        const contodo = new ConTodo();
+    });
+</script>
+```
+
 
 ### Demo
 A demo can be found [here](https://umamiappearance.github.io/contodo/examples/demo.html).

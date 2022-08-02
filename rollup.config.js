@@ -5,12 +5,12 @@ import { importManager } from "rollup-plugin-import-manager";
 const output = (subDir="", appendix="") => [
     {   
         format: "iife",
-        name: "contodo",
+        name: "ConTodo",
         file: `./dist/${subDir}contodo${appendix}.iife.js`
     },
     {   
         format: "iife",
-        name: "contodo",
+        name: "ConTodo",
         file: `./dist/${subDir}contodo${appendix}.iife.min.js`,
         plugins: [terser()]
     },

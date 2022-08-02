@@ -28,7 +28,7 @@ var defaultCSS = ".contodo {\n    position: inherit;\n    display: block;\n    f
 /**
  * [contodo]{@link https://github.com/UmamiAppearance/contodo}
  *
- * @version 0.1.5
+ * @version 0.2.0
  * @author UmamiAppearance [mail@umamiappearance.eu]
  * @license GPL-3.0
  */
