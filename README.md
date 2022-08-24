@@ -9,12 +9,12 @@ _HTML Console._ Let's you output your browser **con**sole **to** a **do**cument 
 ## Installation
 ### GitHub
 ```sh
-git clone https://github.com/UmamiAppearance/BaseExJS.git
+git clone https://github.com/UmamiAppearance/contodo.git
 ```
 
 ### npm
 ```sh
-nmp install base-ex
+nmp install contodo
 ```
 
 ## Builds
