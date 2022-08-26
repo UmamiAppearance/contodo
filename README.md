@@ -35,7 +35,7 @@ Also in subfolder _no-style_ ([github:dist/no-style](https://github.com/UmamiApp
 
 
 ## Usage
-First either import the esm-module or add the iife script tag to the html page. After that, the constructor ***ConTodo** is available and ready to use:
+First either import the esm-module or add the iife script tag to the HTML page. After that, the constructor **ConTodo** is available and ready to use:
 
 ### ES6
 ```html
@@ -108,12 +108,13 @@ Default: `{}`
 | showTimestamp  | _Boolean_            | `false`     | adds a timestamp to every log                            |
 | width          | _String (css-value)_ | `"inherit"` | css value for style width of the console node            |
 
+
 ### Methods
 
 #### `createDocumentNode`
-Creates the main document node and appends it to the provided [`node`](#node) or the document body if nothing is provided.  
+Creates the main document node and appends it to the provided [`node`](#node) or the document body, if nothing is provided.  
 The method is called during initialization if the [`option`](#options-1) `autostart` is set.  
-If the build in css is available and the [`option`](#options-1) `applyCSS` is set to true, method [`applyCSS`](#applycss) is getting called by this method.
+If the build in css is available and the [`option`](#options-1) `applyCSS` is set to true, method [`applyCSS`](#applycss) is getting additionally called.
 
 #### `destroyDocumentNode`
 Destroys the main node. Also resets the browser console to its default state by calling [`restoreDefaultConsole`](#restoreDefaultConsole).
@@ -125,13 +126,13 @@ Replaces default console methods with the contodo methods. The method is called 
 Resets the browser console to its default state.
 
 #### `applyCSS`
-Applies the build in CSS to document header if available and not already applied. This method is automatically getting called by [`createDocumentNode`](#createdocumentnode).
+Applies the build in CSS to the document header (if available and not already applied). This method is automatically getting called by [`createDocumentNode`](#createdocumentnode).
 
 #### `removeCSS`
 Removes former applied build in css.
 
 #### Api Reference
-Apart from `console.dir/dirxml` and `console.group` has all methods of a browsers console available **contodo**. A reference of those methods can be found [here](https://developer.mozilla.org/en-US/docs/Web/API/Console).
+Apart from `console.dir/dirxml` and `console.group` **contodo** has all methods of a browsers console available. A reference of those methods can be found [here](https://developer.mozilla.org/en-US/docs/Web/API/Console).
 
 
 ## Themes
