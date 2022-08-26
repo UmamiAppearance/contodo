@@ -79,7 +79,8 @@ First either import the esm-module or add the iife script tag to the HTML page. 
 
 
 ### Demo
-A demo can be found [here](https://umamiappearance.github.io/contodo/examples/demo.html).
+A demo can be found [here](https://umamiappearance.github.io/contodo/examples/demo.html).  
+On your local machine, you can run `npm install` once and then `npm start` to open the demo page.
 
 
 ### Options
