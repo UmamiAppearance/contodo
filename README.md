@@ -49,7 +49,7 @@ First either import the esm-module or add the iife script tag to the HTML page. 
 ##### CDN (jsdelivr)
 ```html
 <script type="module">
-    import ConTodo from "https://cdn.jsdelivr.net/npm/contodo@0.2.0/dist/contodo.esm.min.js";
+    import ConTodo from "https://cdn.jsdelivr.net/npm/contodo@latest/dist/contodo.esm.min.js;
     document.addEventListener("DOMContentLoaded", () => {
         const contodo = new ConTodo();
     });
@@ -69,7 +69,7 @@ First either import the esm-module or add the iife script tag to the HTML page. 
 
 ##### CDN (jsdelivr)
 ```html
-<script src="https://cdn.jsdelivr.net/npm/contodo@0.2.0/dist/contodo.iife.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/contodo@latest/dist/contodo.iife.min.js"></script>
 <script>
     document.addEventListener("DOMContentLoaded", () => {
         const contodo = new ConTodo();
