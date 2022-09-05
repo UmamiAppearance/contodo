@@ -19,7 +19,7 @@ nmp install contodo
 ```
 
 ## Builds
-Builds can be find them in the directory dist ([github:dist](https://github.com/UmamiAppearance/contodo/tree/main/dist)). 
+Builds can be found in the directory dist ([github:dist](https://github.com/UmamiAppearance/contodo/tree/main/dist)). 
 
 If you want to build your own copy run:
 ```sh
