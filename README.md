@@ -5,7 +5,7 @@
 
 _HTML Console._ Let's you output your browser **con**sole **to** a **do**cument node.
 
-![contodo-image](https://github.com/UmamiAppearance/contodo/blob/main/media/contodo.gif?raw=true)
+[![contodo-image](https://github.com/UmamiAppearance/contodo/blob/main/media/contodo.gif?raw=true)](https://umamiappearance.github.io/contodo/examples/demo.html)
 
 ## Installation
 ### GitHub
