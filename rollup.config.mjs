@@ -1,21 +1,7 @@
-import { string } from "rollup-plugin-string";
 import { importManager } from "rollup-plugin-import-manager";
 import { yourFunction } from "rollup-plugin-your-function";
 import CleanCSS from "clean-css";
-import { minify } from "terser";
-
-const terser = yourFunction({
-    output: true,
-    name: "terser",
-    fn: async (source, options) => minify(
-        source,
-        {
-            module: (/^esm?$/).test(options.outputOptions.format),
-            toplevel: options.outputOptions.format === "cjs",
-            sourceMap: true
-        }
-    )
-});
+import terser from "@rollup/plugin-terser";
 
 
 const output = (subDir="", appendix="") => [
@@ -28,7 +14,7 @@ const output = (subDir="", appendix="") => [
         format: "iife",
         name: "ConTodo",
         file: `./dist/${subDir}contodo${appendix}.iife.min.js`,
-        plugins: [terser]
+        plugins: [terser()]
     },
     {   
         format: "es",
@@ -39,7 +25,7 @@ const output = (subDir="", appendix="") => [
         format: "es",
         name: "contodo",
         file: `./dist/${subDir}contodo${appendix}.esm.min.js`,
-        plugins: [terser]
+        plugins: [terser()]
     },
 ];
 
@@ -52,11 +38,8 @@ const exports = [
                 include: "**/*.css",
                 fn: source => {
                     const output = new CleanCSS({}).minify(source);
-                    return output.styles;
+                    return `export default ${JSON.stringify(output.styles)}`;
                 },
-            }),
-            string({
-                include: "**/*.css",
             }),
             importManager({
                 units: {
