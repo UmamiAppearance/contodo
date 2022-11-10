@@ -42,7 +42,7 @@
     "http-server": "^14.1.1",
     "no-bro-cote": "^0.2.6",
     "rollup": "^3.2.5",
-    "rollup-plugin-import-manager": "^0.3.2",
-    "rollup-plugin-your-function": "^0.4.2"
+    "rollup-plugin-import-manager": "^0.3.3",
+    "rollup-plugin-your-function": "^0.4.3"
   }
 }
