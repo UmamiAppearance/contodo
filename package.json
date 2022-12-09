@@ -1,6 +1,6 @@
 {
   "name": "contodo",
-  "version": "0.2.8",
+  "version": "0.2.9",
   "description": "HTML Console. Let's you output your browser console to a document node.",
   "browser": "./dist/contodo.esm.js",
   "exports": {
@@ -38,11 +38,11 @@
   "devDependencies": {
     "@rollup/plugin-terser": "^0.1.0",
     "clean-css": "^5.3.1",
-    "eslint": "^8.27.0",
+    "eslint": "^8.29.0",
     "http-server": "^14.1.1",
-    "no-bro-cote": "^0.2.6",
-    "rollup": "^3.2.5",
-    "rollup-plugin-import-manager": "^0.3.3",
-    "rollup-plugin-your-function": "^0.4.3"
+    "no-bro-cote": "^0.2.7",
+    "rollup": "^3.7.1",
+    "rollup-plugin-import-manager": "^0.3.4",
+    "rollup-plugin-your-function": "^0.4.4"
   }
 }
