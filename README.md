@@ -134,6 +134,9 @@ Applies the build in CSS to the document header (if available and not already ap
 #### `removeCSS`
 Removes former applied build in css.
 
+### API
+A contodo object holds an `api` object, which directly accesses the console-methods. Those methods are equivalent to the methods of the build in browser console.
+
 #### Api Reference
 Apart from `console.dir/dirxml` and `console.group` **contodo** has all methods of a browsers console available. A reference of those methods can be found [here](https://developer.mozilla.org/en-US/docs/Web/API/Console).
 
@@ -144,4 +147,5 @@ If you like to build your own copy of **contodo** with custom css included, modi
 
 
 ## License
-This work is licensed under [GPL-3.0](https://opensource.org/licenses/GPL-3.0).
+[MIT](https://opensource.org/licenses/MIT)  
+Copyright (c) 2022, UmamiAppearance

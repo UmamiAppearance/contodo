@@ -28,9 +28,9 @@ var defaultCSS = ".contodo{position:inherit;display:block;font-family:monospace;
 /**
  * [contodo]{@link https://github.com/UmamiAppearance/contodo}
  *
- * @version 0.2.9
+ * @version 0.3.0
  * @author UmamiAppearance [mail@umamiappearance.eu]
- * @license GPL-3.0
+ * @license MIT
  */
 
 
@@ -110,6 +110,9 @@ class ConTodo {
         // Bind Error Function to Class
         this.catchErrorFN = this.catchErrorFN.bind(this);
 
+        // create API
+        this.#makeAPI();
+
         // Auto Init
         if (this.options.autostart) {
             this.createDocumentNode();
@@ -149,6 +152,35 @@ class ConTodo {
         this.mainElem = null;
     }
 
+    #makeAPI() {
+        const naErr = () => {
+            throw new ReferenceError("contodo does not have this method available");
+        };
+
+        this.api = {
+            assert: (bool, ...args) => this.assert(bool, args),
+            count: (label) => this.count(label),
+            countReset: (label) => this.countReset(label),
+            counters: () => this.countersShow(),
+            clear: () => this.clear(),
+            debug: (...args) => this.debug(args),
+            dir: naErr,
+            dirxml: naErr,
+            error: (...args) => this.makeLog("error", args),
+            group: naErr,
+            info: (...args) => this.makeLog("info", args),
+            log: (...args) => this.makeLog("log", args),
+            table: (...args) => this.makeTableLog(args),
+            time: (label) => this.time(label),
+            timeEnd: (label) => this.timeEnd(label),
+            timeLog: (label) => this.timeLog(label),
+            timers: () => this.timersShow(),
+            trace: (...args) => this.trace(args),
+            warn: (...args) => this.makeLog("warn", args),
+        };
+        this.api.exception = this.api.error;
+    }
+
 
     /**
      * Replaces default console methods with
@@ -158,23 +190,23 @@ class ConTodo {
         if (this.active) {
             return;
         }
-        console.assert = (bool, ...args) => this.assert(bool, args);
-        console.count = (label) => this.count(label);
-        console.countReset = (label) => this.countReset(label);
-        console.counters = () => this.countersShow();
-        console.clear = () => this.clear();
-        console.debug = (...args) => this.debug(args);
-        console.error = (...args) => this.makeLog("error", args);
-        console.exception = console.error;
-        console.info = (...args) => this.makeLog("info", args);
-        console.log = (...args) => this.makeLog("log", args);
-        console.table = (...args) => this.makeTableLog(args);
-        console.time = (label) => this.time(label);
-        console.timeEnd = (label) => this.timeEnd(label);
-        console.timeLog = (label) => this.timeLog(label);
-        console.timers = () => this.timersShow();
-        console.trace = (...args) => this.trace(args);
-        console.warn = (...args) => this.makeLog("warn", args);
+        console.assert = this.api.assert;
+        console.count = this.api.count;
+        console.countReset = this.api.countReset;
+        console.counters = this.api.counters;
+        console.clear = this.api.clear;
+        console.debug = this.api.debug;
+        console.error = this.api.error;
+        console.exception = this.api.exception;
+        console.info = this.api.info;
+        console.log = this.api.log;
+        console.table = this.api.table;
+        console.time = this.api.time;
+        console.timeEnd = this.api.timeEnd;
+        console.timeLog = this.api.timeLog;
+        console.timers = this.api.timers;
+        console.trace = this.api.trace;
+        console.warn = this.api.warn;
         if (this.options.catchErrors) window.addEventListener("error", this.catchErrorFN, false);
         this.active = true;
     }
