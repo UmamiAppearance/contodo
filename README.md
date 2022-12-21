@@ -138,6 +138,9 @@ Removes former applied build in css.
 ### API
 A contodo object holds an `api` object, which directly accesses the console-methods. Those methods are equivalent to the methods of the build in browser console.
 
+### Default console access
+After running [`restoreDefaultConsole`](#restoredefaultconsole) the default methods of the console are restored. It is however sometimes necessary to access the default console, while a contodo instance is active. For this case you have access to the default methods at `window._console`.
+
 #### Api Reference
 Apart from `console.dir/dirxml` and `console.group` **contodo** has all methods of a browsers console available. A reference of those methods can be found [here](https://developer.mozilla.org/en-US/docs/Web/API/Console).
 
