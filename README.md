@@ -103,6 +103,7 @@ Default: `{}`
 | applyCSS       | _Boolean_            | `true`      | applies the build in css to the document                 |
 | autostart      | _Boolean_            | `true`      | initializes and attaches the console automatically       |
 | catchErrors    | _Boolean_            | `false`     | displays errors inside of the console node               |
+| clearButton    | _Boolean_            | `false`     | adds a clickable anchor tag, to clear the console        |
 | height         | _String (css-value)_ | `"inherit"` | css value for style height of the console node           |
 | maxEntries     | _Number_             | `0`         | removes older entries if the given value (>0) is reached |
 | preventDefault | _Boolean_            | `false`     | prevents logging to the internal console                 |

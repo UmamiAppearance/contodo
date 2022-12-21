@@ -44,6 +44,7 @@ class ConTodo {
         this.options = {
             autostart: hasOption("autostart") ? Boolean(options.autostart) : true,
             catchErrors: hasOption("catchErrors") ? Boolean(options.catchErrors) : false,
+            clearButton: hasOption("clearButton") ? Boolean(options.clearButton) : false,
             height: hasOption("height") ? options.height : "inherit",
             maxEntries: hasOption("maxEntries") ? Math.max(parseInt(Number(options.maxEntries), 10), 0) : 0,
             preventDefault: hasOption("preventDefault") ? Boolean(options.preventDefault) : false,
@@ -85,10 +86,11 @@ class ConTodo {
    
         // Class values
         this.active = false;
-        this.counters = new Object();
+        this.counters = {};
         this.mainElem = null;
+        this.clearBtn = null;
         this.style = null;
-        this.timers = new Object;
+        this.timers = {};
 
         // Bind Error Function to Class
         this.catchErrorFN = this.catchErrorFN.bind(this);
@@ -110,9 +112,20 @@ class ConTodo {
     createDocumentNode() {
         if (!this.mainElem) {
             this.mainElem = document.createElement("code");
-            this.parentNode.append(this.mainElem);
             this.mainElem.classList.add("contodo");
             this.mainElem.style.height = this.options.height;
+            this.parentNode.append(this.mainElem);
+
+            if (this.options.clearButton) {
+                this.mainElem.classList.add("clearBtn");
+                this.clearBtn = document.createElement("a");
+                this.clearBtn.textContent = "clear";
+                this.clearBtn.title = "clear console";
+                this.clearBtn.addEventListener("click", () => { this.clear(false); }, false);
+                this.clearBtn.classList.add("contodo-clear");
+                this.parentNode.append(this.clearBtn);
+            }
+            
             this.logCount = 0;
         }
         if (this.options.applyCSS) {
@@ -132,6 +145,10 @@ class ConTodo {
             return;
         }
         this.mainElem.remove();
+        if (this.clearBtn) {
+            this.clearBtn.remove();
+            this.clearBtn = null;
+        }
         this.mainElem = null;
     }
 
@@ -932,7 +949,7 @@ class ConTodo {
      */
     timersShow() {
         const now = window.performance.now();
-        const timers = new Object();
+        const timers = {};
         for (const timer in this.timers) {
             timers[timer] = `${now - this.timers[timer]} ms`;
         }
