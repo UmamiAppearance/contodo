@@ -103,6 +103,7 @@ Default: `{}`
 | applyCSS       | _Boolean_            | `true`      | applies the build in css to the document                 |
 | autostart      | _Boolean_            | `true`      | initializes and attaches the console automatically       |
 | catchErrors    | _Boolean_            | `false`     | displays errors inside of the console node               |
+| clearButton    | _Boolean_            | `false`     | adds a clickable anchor tag, to clear the console        |
 | height         | _String (css-value)_ | `"inherit"` | css value for style height of the console node           |
 | maxEntries     | _Number_             | `0`         | removes older entries if the given value (>0) is reached |
 | preventDefault | _Boolean_            | `false`     | prevents logging to the internal console                 |
@@ -137,6 +138,9 @@ Removes former applied build in css.
 ### API
 A contodo object holds an `api` object, which directly accesses the console-methods. Those methods are equivalent to the methods of the build in browser console.
 
+### Default console access
+After running [`restoreDefaultConsole`](#restoredefaultconsole) the default methods of the console are restored. It is however sometimes necessary to access the default console, while a contodo instance is active. For this case you have access to the default methods at `window._console`.
+
 #### Api Reference
 Apart from `console.dir/dirxml` and `console.group` **contodo** has all methods of a browsers console available. A reference of those methods can be found [here](https://developer.mozilla.org/en-US/docs/Web/API/Console).
 
@@ -147,5 +151,7 @@ If you like to build your own copy of **contodo** with custom css included, modi
 
 
 ## License
-[MIT](https://opensource.org/licenses/MIT)  
+
+[MIT](https://opensource.org/licenses/MIT)
+
 Copyright (c) 2022, UmamiAppearance

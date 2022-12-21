@@ -99,6 +99,7 @@
 
         const options = {
             applyCSS: false,
+            clearButton: true,
             catchErrors: false,
             height: "360px"
         }
@@ -141,7 +142,7 @@
         }
         enterCommand();
 
-        if (/iPhone|iPad|iPod|Android/i.test(navigator.userAgent)) {
+        if (/iPhone|iPad|Android/i.test(navigator.userAgent)) {
             alert("You should open this on a machine with developer tools.")
         }
 

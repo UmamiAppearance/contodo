@@ -23,12 +23,12 @@ const isIdentifier = (str) => {
     return Boolean(match);
 };
 
-var defaultCSS = ".contodo{position:inherit;display:block;font-family:monospace;font-size:inherit;min-width:100px;min-height:100px;white-space:break-spaces;overflow:auto;margin:auto;background-color:#fff;color:#000;padding:1px;scroll-behavior:smooth}.contodo>.log{border-color:rgba(157,157,157,.2);border-width:0 0 1pt 0;border-style:solid;padding:2px 5px}.contodo>.log:first-child{border-width:1pt 0}.contodo>.warn{background-color:#fafab4}.contodo>.warn>span.string{color:#505000}.contodo>.error{background-color:#f0c8c8}.contodo>.error>span.string{color:#640000}.contodo>.time{opacity:.5;font-size:80%}.contodo .null{color:grey}.contodo .bigint,.contodo .boolean,.contodo .number,.contodo .object{color:#32963c}.contodo .array-string,.contodo .fn-args,.contodo .symbol,.contodo .trace-head{color:#f0f}.contodo .function,.contodo .object,.contodo .trace-file{color:#2864fa}.contodo table{width:100%;text-align:left;border-spacing:0;border-collapse:collapse;border:2px #333;border-style:solid none}.contodo th,.contodo thead{font-weight:700}.contodo thead>tr,.contodo tr:nth-child(2n){background-color:rgba(200,200,220,.1)}.contodo td,.contodo th{padding:3px 0;border:1px solid rgba(157,157,157,.2);width:1%}";
+var defaultCSS = ".contodo{position:inherit;display:block;font-family:monospace;font-size:inherit;min-width:100px;min-height:100px;white-space:break-spaces;overflow:auto;margin:auto;background-color:#fff;color:#000;padding:1px;scroll-behavior:smooth}.contodo>.log{border-color:rgba(157,157,157,.2);border-width:0 0 1pt 0;border-style:solid;padding:2px 5px}.contodo>.log:first-child{border-width:1pt 0}.contodo>.warn{background-color:#fafab4}.contodo>.warn>span.string{color:#505000}.contodo>.error{background-color:#f0c8c8}.contodo>.error>span.string{color:#640000}.contodo>.time{opacity:.5;font-size:80%}.contodo .null{color:grey}.contodo .bigint,.contodo .boolean,.contodo .number,.contodo .object{color:#32963c}.contodo .array-string,.contodo .fn-args,.contodo .symbol,.contodo .trace-head{color:#f0f}.contodo .function,.contodo .object,.contodo .trace-file{color:#2864fa}.contodo table{width:100%;text-align:left;border-spacing:0;border-collapse:collapse;border:2px #333;border-style:solid none}.contodo th,.contodo thead{font-weight:700}.contodo thead>tr,.contodo tr:nth-child(2n){background-color:rgba(200,200,220,.1)}.contodo td,.contodo th{padding:3px 0;border:1px solid rgba(157,157,157,.2);width:1%}.contodo-clear{display:inline-block;text-decoration:underline;cursor:pointer;font-size:.9em;margin:0 0 0 calc(100% - 2.8em);background-color:rgba(255,255,255,.9);border-radius:.2em;z-index:1}.contodo.clearBtn{margin-bottom:-2em}";
 
 /**
  * [contodo]{@link https://github.com/UmamiAppearance/contodo}
  *
- * @version 0.3.0
+ * @version 0.4.0
  * @author UmamiAppearance [mail@umamiappearance.eu]
  * @license MIT
  */
@@ -68,6 +68,7 @@ class ConTodo {
         this.options = {
             autostart: hasOption("autostart") ? Boolean(options.autostart) : true,
             catchErrors: hasOption("catchErrors") ? Boolean(options.catchErrors) : false,
+            clearButton: hasOption("clearButton") ? Boolean(options.clearButton) : false,
             height: hasOption("height") ? options.height : "inherit",
             maxEntries: hasOption("maxEntries") ? Math.max(parseInt(Number(options.maxEntries), 10), 0) : 0,
             preventDefault: hasOption("preventDefault") ? Boolean(options.preventDefault) : false,
@@ -82,30 +83,33 @@ class ConTodo {
         }
         
         // Store Default Console Methods
-        this.defaultConsole = {
-            assert: console.assert.bind(console),
-            count: console.count.bind(console),
-            countReset: console.countReset.bind(console),
-            clear: console.clear.bind(console),
-            debug: console.debug.bind(console),
-            error: console.error.bind(console),
-            exception: console.exception ? console.exception.bind(console) : null,
-            info: console.info.bind(console),
-            log: console.log.bind(console),
-            table: console.table.bind(console),
-            time: console.time.bind(console),
-            timeEnd: console.timeEnd.bind(console),
-            timeLog: console.timeLog.bind(console),
-            trace: console.trace.bind(console),
-            warn: console.warn.bind(console)
-        };
+        if (!window._console) {
+            window._console = {
+                assert: console.assert.bind(console),
+                count: console.count.bind(console),
+                countReset: console.countReset.bind(console),
+                clear: console.clear.bind(console),
+                debug: console.debug.bind(console),
+                error: console.error.bind(console),
+                exception: console.exception ? console.exception.bind(console) : null,
+                info: console.info.bind(console),
+                log: console.log.bind(console),
+                table: console.table.bind(console),
+                time: console.time.bind(console),
+                timeEnd: console.timeEnd.bind(console),
+                timeLog: console.timeLog.bind(console),
+                trace: console.trace.bind(console),
+                warn: console.warn.bind(console)
+            };
+        }
    
         // Class values
         this.active = false;
-        this.counters = new Object();
+        this.counters = {};
         this.mainElem = null;
+        this.clearBtn = null;
         this.style = null;
-        this.timers = new Object;
+        this.timers = {};
 
         // Bind Error Function to Class
         this.catchErrorFN = this.catchErrorFN.bind(this);
@@ -127,9 +131,20 @@ class ConTodo {
     createDocumentNode() {
         if (!this.mainElem) {
             this.mainElem = document.createElement("code");
-            this.parentNode.append(this.mainElem);
             this.mainElem.classList.add("contodo");
             this.mainElem.style.height = this.options.height;
+            this.parentNode.append(this.mainElem);
+
+            if (this.options.clearButton) {
+                this.mainElem.classList.add("clearBtn");
+                this.clearBtn = document.createElement("a");
+                this.clearBtn.textContent = "clear";
+                this.clearBtn.title = "clear console";
+                this.clearBtn.addEventListener("click", () => { this.clear(false); }, false);
+                this.clearBtn.classList.add("contodo-clear");
+                this.parentNode.append(this.clearBtn);
+            }
+            
             this.logCount = 0;
         }
         if (this.options.applyCSS) {
@@ -149,6 +164,10 @@ class ConTodo {
             return;
         }
         this.mainElem.remove();
+        if (this.clearBtn) {
+            this.clearBtn.remove();
+            this.clearBtn = null;
+        }
         this.mainElem = null;
     }
 
@@ -219,23 +238,23 @@ class ConTodo {
         if (!this.active) {
             return;
         }
-        console.assert = this.defaultConsole.assert;
-        console.count = this.defaultConsole.count;
-        console.countReset = this.defaultConsole.countReset;
+        console.assert = window._console.assert;
+        console.count = window._console.count;
+        console.countReset = window._console.countReset;
         delete console.counters;
-        console.clear = this.defaultConsole.clear;
-        console.debug = this.defaultConsole.debug;
-        console.error = this.defaultConsole.error;
-        console.exception = this.defaultConsole.exception;
-        console.info = this.defaultConsole.info;
-        console.log = this.defaultConsole.log;
-        console.table = this.defaultConsole.table;
-        console.time = this.defaultConsole.time;
-        console.timeEnd = this.defaultConsole.timeEnd;
-        console.timeLog = this.defaultConsole.timeLog;
+        console.clear = window._console.clear;
+        console.debug = window._console.debug;
+        console.error = window._console.error;
+        console.exception = window._console.exception;
+        console.info = window._console.info;
+        console.log = window._console.log;
+        console.table = window._console.table;
+        console.time = window._console.time;
+        console.timeEnd = window._console.timeEnd;
+        console.timeLog = window._console.timeLog;
         delete console.timers;
-        console.trace = this.defaultConsole.trace;
-        console.warn = this.defaultConsole.warn;
+        console.trace = window._console.trace;
+        console.warn = window._console.warn;
         if (this.options.catchErrors) window.removeEventListener("error", this.catchErrorFN, false);
         this.active = false;
     }
@@ -304,7 +323,7 @@ class ConTodo {
         };
 
         if (!preventDefaultLog) {
-            this.defaultConsole[type](...args);
+            window._console[type](...args);
         }
 
         const newLog = this.#makeDivLogEntry(type);
@@ -349,7 +368,7 @@ class ConTodo {
      */
     makeTableLog(args, preventDefaultLog=this.options.preventDefault) {
         if (!preventDefaultLog) {
-            this.defaultConsole.table(...args);
+            window._console.table(...args);
         }
 
         // Helper function. Test wether the data
@@ -491,7 +510,7 @@ class ConTodo {
      */
     #foundEdgeCaseError(input) {
         console.error("You found an edge case, which is not covered yet.\nPlease create an issue mentioning your input at:\nhttps://github.com/UmamiAppearance/contodo/issues");
-        this.defaultConsole.warn(input);
+        window._console.warn(input);
         
     }
 
@@ -793,7 +812,7 @@ class ConTodo {
      */
     assert(bool, args) {
         if (!this.options.preventDefault) {
-            this.defaultConsole.assert(bool, ...args);
+            window._console.assert(bool, ...args);
         }
         if (!bool) {
             this.makeLog("error", ["Assertion failed:", ...args], true);
@@ -847,7 +866,7 @@ class ConTodo {
      */
     clear(info=true) {
         if (!this.options.preventDefault && info) {
-            this.defaultConsole.clear();
+            window._console.clear();
         }
         this.mainElem.innerHTML = "";
         this.logCount = 0;
@@ -866,7 +885,7 @@ class ConTodo {
      */
     debug(args) {
         if (!this.options.preventDefault) {
-            this.defaultConsole.debug(...args);
+            window._console.debug(...args);
         }
         if (this.options.showDebugging) {
             this.makeLog("log", args, true);
@@ -888,7 +907,7 @@ class ConTodo {
             this.makeLog("warn", [msg], true);
 
             if (!this.options.preventDefault) {
-                this.defaultConsole.warn(msg);
+                window._console.warn(msg);
             }
         }
     }
@@ -920,7 +939,7 @@ class ConTodo {
 
         this.makeLog(type, [msg], true);
         if (!this.options.preventDefault) {
-            this.defaultConsole[type](msg);
+            window._console[type](msg);
         }
         
         return label;
@@ -949,7 +968,7 @@ class ConTodo {
      */
     timersShow() {
         const now = window.performance.now();
-        const timers = new Object();
+        const timers = {};
         for (const timer in this.timers) {
             timers[timer] = `${now - this.timers[timer]} ms`;
         }
@@ -1030,7 +1049,7 @@ class ConTodo {
                 msg.push(`  ${line.name}${" ".repeat(lenLeft-line.len)}${line.file}\n`);
             }
 
-            this.defaultConsole.log(...msg);
+            window._console.log(...msg);
         }
     }
 }
