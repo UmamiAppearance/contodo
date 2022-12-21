@@ -69,3 +69,20 @@
     border: 1px solid rgba(157, 157, 157, 0.2);
     width: 1%;
 }
+.contodo-clear {
+    display: inline-block;
+    text-decoration: underline;
+    cursor: pointer;
+    font-size: 0.9em;
+    margin: 0 0 0 calc(100% - 2.8em);
+    color: #fff;
+    background-color: rgba(22, 22, 29, 0.9);
+    border-radius: 0.2em;
+    z-index: 1;
+}
+.contodo-clear:hover {
+    color: yellow;
+}
+.contodo.clearBtn {
+    margin-bottom: -2em;
+}
