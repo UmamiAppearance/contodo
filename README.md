@@ -147,5 +147,7 @@ If you like to build your own copy of **contodo** with custom css included, modi
 
 
 ## License
-[MIT](https://opensource.org/licenses/MIT)  
+
+[MIT](https://opensource.org/licenses/MIT)
+
 Copyright (c) 2022, UmamiAppearance

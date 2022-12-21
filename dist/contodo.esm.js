@@ -28,7 +28,7 @@ var defaultCSS = ".contodo{position:inherit;display:block;font-family:monospace;
 /**
  * [contodo]{@link https://github.com/UmamiAppearance/contodo}
  *
- * @version 0.3.0
+ * @version 0.4.0
  * @author UmamiAppearance [mail@umamiappearance.eu]
  * @license MIT
  */
@@ -82,23 +82,25 @@ class ConTodo {
         }
         
         // Store Default Console Methods
-        this.defaultConsole = {
-            assert: console.assert.bind(console),
-            count: console.count.bind(console),
-            countReset: console.countReset.bind(console),
-            clear: console.clear.bind(console),
-            debug: console.debug.bind(console),
-            error: console.error.bind(console),
-            exception: console.exception ? console.exception.bind(console) : null,
-            info: console.info.bind(console),
-            log: console.log.bind(console),
-            table: console.table.bind(console),
-            time: console.time.bind(console),
-            timeEnd: console.timeEnd.bind(console),
-            timeLog: console.timeLog.bind(console),
-            trace: console.trace.bind(console),
-            warn: console.warn.bind(console)
-        };
+        if (!window._console) {
+            window._console = {
+                assert: console.assert.bind(console),
+                count: console.count.bind(console),
+                countReset: console.countReset.bind(console),
+                clear: console.clear.bind(console),
+                debug: console.debug.bind(console),
+                error: console.error.bind(console),
+                exception: console.exception ? console.exception.bind(console) : null,
+                info: console.info.bind(console),
+                log: console.log.bind(console),
+                table: console.table.bind(console),
+                time: console.time.bind(console),
+                timeEnd: console.timeEnd.bind(console),
+                timeLog: console.timeLog.bind(console),
+                trace: console.trace.bind(console),
+                warn: console.warn.bind(console)
+            };
+        }
    
         // Class values
         this.active = false;
@@ -219,23 +221,23 @@ class ConTodo {
         if (!this.active) {
             return;
         }
-        console.assert = this.defaultConsole.assert;
-        console.count = this.defaultConsole.count;
-        console.countReset = this.defaultConsole.countReset;
+        console.assert = window._console.assert;
+        console.count = window._console.count;
+        console.countReset = window._console.countReset;
         delete console.counters;
-        console.clear = this.defaultConsole.clear;
-        console.debug = this.defaultConsole.debug;
-        console.error = this.defaultConsole.error;
-        console.exception = this.defaultConsole.exception;
-        console.info = this.defaultConsole.info;
-        console.log = this.defaultConsole.log;
-        console.table = this.defaultConsole.table;
-        console.time = this.defaultConsole.time;
-        console.timeEnd = this.defaultConsole.timeEnd;
-        console.timeLog = this.defaultConsole.timeLog;
+        console.clear = window._console.clear;
+        console.debug = window._console.debug;
+        console.error = window._console.error;
+        console.exception = window._console.exception;
+        console.info = window._console.info;
+        console.log = window._console.log;
+        console.table = window._console.table;
+        console.time = window._console.time;
+        console.timeEnd = window._console.timeEnd;
+        console.timeLog = window._console.timeLog;
         delete console.timers;
-        console.trace = this.defaultConsole.trace;
-        console.warn = this.defaultConsole.warn;
+        console.trace = window._console.trace;
+        console.warn = window._console.warn;
         if (this.options.catchErrors) window.removeEventListener("error", this.catchErrorFN, false);
         this.active = false;
     }
@@ -304,7 +306,7 @@ class ConTodo {
         };
 
         if (!preventDefaultLog) {
-            this.defaultConsole[type](...args);
+            window._console[type](...args);
         }
 
         const newLog = this.#makeDivLogEntry(type);
@@ -349,7 +351,7 @@ class ConTodo {
      */
     makeTableLog(args, preventDefaultLog=this.options.preventDefault) {
         if (!preventDefaultLog) {
-            this.defaultConsole.table(...args);
+            window._console.table(...args);
         }
 
         // Helper function. Test wether the data
@@ -491,7 +493,7 @@ class ConTodo {
      */
     #foundEdgeCaseError(input) {
         console.error("You found an edge case, which is not covered yet.\nPlease create an issue mentioning your input at:\nhttps://github.com/UmamiAppearance/contodo/issues");
-        this.defaultConsole.warn(input);
+        window._console.warn(input);
         
     }
 
@@ -793,7 +795,7 @@ class ConTodo {
      */
     assert(bool, args) {
         if (!this.options.preventDefault) {
-            this.defaultConsole.assert(bool, ...args);
+            window._console.assert(bool, ...args);
         }
         if (!bool) {
             this.makeLog("error", ["Assertion failed:", ...args], true);
@@ -847,7 +849,7 @@ class ConTodo {
      */
     clear(info=true) {
         if (!this.options.preventDefault && info) {
-            this.defaultConsole.clear();
+            window._console.clear();
         }
         this.mainElem.innerHTML = "";
         this.logCount = 0;
@@ -866,7 +868,7 @@ class ConTodo {
      */
     debug(args) {
         if (!this.options.preventDefault) {
-            this.defaultConsole.debug(...args);
+            window._console.debug(...args);
         }
         if (this.options.showDebugging) {
             this.makeLog("log", args, true);
@@ -888,7 +890,7 @@ class ConTodo {
             this.makeLog("warn", [msg], true);
 
             if (!this.options.preventDefault) {
-                this.defaultConsole.warn(msg);
+                window._console.warn(msg);
             }
         }
     }
@@ -920,7 +922,7 @@ class ConTodo {
 
         this.makeLog(type, [msg], true);
         if (!this.options.preventDefault) {
-            this.defaultConsole[type](msg);
+            window._console[type](msg);
         }
         
         return label;
@@ -1030,7 +1032,7 @@ class ConTodo {
                 msg.push(`  ${line.name}${" ".repeat(lenLeft-line.len)}${line.file}\n`);
             }
 
-            this.defaultConsole.log(...msg);
+            window._console.log(...msg);
         }
     }
 }

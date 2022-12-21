@@ -103,6 +103,7 @@
             height: "360px"
         }
         const htmlConsole = new ConTodo(document.querySelector("fieldset"), options);
+        window.htmlConsole = htmlConsole;
 
         const theme = document.querySelector("#theme");
         const setTheme = () => {
@@ -141,7 +142,7 @@
         }
         enterCommand();
 
-        if (/iPhone|iPad|iPod|Android/i.test(navigator.userAgent)) {
+        if (/iPhone|iPad|Android/i.test(navigator.userAgent)) {
             alert("You should open this on a machine with developer tools.")
         }
 
