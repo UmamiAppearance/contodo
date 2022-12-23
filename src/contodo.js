@@ -1,13 +1,32 @@
 /**
  * [contodo]{@link https://github.com/UmamiAppearance/contodo}
  *
- * @version 0.4.0
+ * @version 0.4.1
  * @author UmamiAppearance [mail@umamiappearance.eu]
  * @license MIT
  */
 
 import { isIdentifier, isPositiveInteger } from "./utils.js";
 import defaultCSS from "./default-css.js";
+
+// Store Default Console Methods
+window._console = {
+    assert: console.assert.bind(console),
+    count: console.count.bind(console),
+    countReset: console.countReset.bind(console),
+    clear: console.clear.bind(console),
+    debug: console.debug.bind(console),
+    error: console.error.bind(console),
+    exception: console.exception ? console.exception.bind(console) : null,
+    info: console.info.bind(console),
+    log: console.log.bind(console),
+    table: console.table.bind(console),
+    time: console.time.bind(console),
+    timeEnd: console.timeEnd.bind(console),
+    timeLog: console.timeLog.bind(console),
+    trace: console.trace.bind(console),
+    warn: console.warn.bind(console)
+};
 
 
 /**
@@ -62,28 +81,7 @@ class ConTodo {
             }
             this.options.applyCSS = false;
         }
-        
-        // Store Default Console Methods
-        if (!window._console) {
-            window._console = {
-                assert: console.assert.bind(console),
-                count: console.count.bind(console),
-                countReset: console.countReset.bind(console),
-                clear: console.clear.bind(console),
-                debug: console.debug.bind(console),
-                error: console.error.bind(console),
-                exception: console.exception ? console.exception.bind(console) : null,
-                info: console.info.bind(console),
-                log: console.log.bind(console),
-                table: console.table.bind(console),
-                time: console.time.bind(console),
-                timeEnd: console.timeEnd.bind(console),
-                timeLog: console.timeLog.bind(console),
-                trace: console.trace.bind(console),
-                warn: console.warn.bind(console)
-            };
-        }
-   
+         
         // Class values
         this.active = false;
         this.counters = {};
