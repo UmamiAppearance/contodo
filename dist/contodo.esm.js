@@ -28,7 +28,7 @@ var defaultCSS = ".contodo{position:inherit;display:block;font-family:monospace;
 /**
  * [contodo]{@link https://github.com/UmamiAppearance/contodo}
  *
- * @version 0.4.1
+ * @version 0.4.2
  * @author UmamiAppearance [mail@umamiappearance.eu]
  * @license MIT
  */
