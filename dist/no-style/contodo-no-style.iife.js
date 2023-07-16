@@ -29,7 +29,7 @@ var ConTodo = (function () {
     /**
      * [contodo]{@link https://github.com/UmamiAppearance/contodo}
      *
-     * @version 0.4.6
+     * @version 0.4.7
      * @author UmamiAppearance [mail@umamiappearance.eu]
      * @license MIT
      */
